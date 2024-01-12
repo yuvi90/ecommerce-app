@@ -1,0 +1,80 @@
+version: '3.9'
+services:
+  # MongoDB Container
+  ecom-db:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    env_file:
+      - ./.env.db
+    container_name: mongo_container
+    networks:
+      - ecom
+    volumes:
+      - ecom_db:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    command: [--auth]  
+  # Express Container  
+  backend:
+    build:
+      context: './server'
+      dockerfile: Dockerfile
+    image: backend
+    restart: always
+    ports:
+      - 8000:8000
+      - 9229:9229
+    env_file:
+      - ./server/.env
+    container_name: express_container
+    networks:
+      - ecom
+    volumes:
+      - /app/node_modules
+    develop:
+      watch:
+        - action: rebuild
+          path: ./server/package.json
+        - action: rebuild
+          path: ./server/package-lock.json
+        - action: sync
+          path: ./server
+          target: /app
+          ignore:
+            - node_modules/
+            - dist/
+    depends_on:
+      - ecom-db
+  # React Container
+  frontend:
+    build:
+      context: './client'
+      dockerfile: Dockerfile
+    image: frontend
+    restart: always
+    ports:
+      - 5173:5173
+    env_file:
+      - ./client/.env
+    container_name: react_container
+    networks:
+      - ecom
+    volumes:
+      - /app/node_modules
+    develop:
+      watch:
+        - action: rebuild
+          path: ./client/package.json
+        - action: rebuild
+          path: ./client/package-lock.json
+        - action: sync
+          path: ./client
+          target: /app
+          ignore:
+            - node_modules/
+            - dist/
+networks:
+  ecom:
+volumes:
+  ecom_db:
