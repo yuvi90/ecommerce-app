@@ -1,122 +1,244 @@
+import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import ErrorHandler from "../utils/utility-class.js";
-import { User } from "../models/user.js";
-import { TryCatch } from "../middlewares/error.js";
-import config from "@config/index.js";
+import validator from "validator";
+// Importing Locals
+import { generateAccessToken, generateRefreshToken, verifyToken } from "../utils/helpers.js";
+import userService from "../services/useService.js";
 
-// Login
-export const loginUser = TryCatch(async (req, res, next) => {
-  // Request body
-  const reqBody: {
-    user: string;
-    pwd: string;
-  } = req.body;
-  const { user, pwd } = reqBody;
+// Types
+import { JwtPayload, RefreshTokenPayLoad } from "../types/types.js";
+interface TypedRequestBody<T> extends Request {
+  body: T;
+}
+interface TypedRequestCookies extends Request {
+  cookies: {
+    jwt?: string;
+  };
+}
 
-  try {
-    // Check username and password presence
-    if (!user || !pwd) throw new ErrorHandler("Username and Password are required !", 400);
+const AuthController = {
+  // Register New User
+  registerUser: async (
+    req: TypedRequestBody<{
+      user: string;
+      pwd: string;
+      email: string;
+    }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { user, pwd, email } = req.body;
 
-    // Check User existence
-    const foundUser = await User.findOne({ username: user }).exec();
-    if (!foundUser) throw new ErrorHandler("Invalid Username !", 400); // No User
+    try {
+      // Check username and password presence
+      if (!user || !pwd || !email) {
+        res.status(400).json({ status: false, message: "Incomplete fields !" });
+      }
 
-    // Check Password
-    const match = await bcrypt.compare(pwd, foundUser.password);
-    if (!match) {
-      throw new ErrorHandler("Incorrect Username and Password !", 400);
+      // Check for valid email
+      const isEmail = validator.default.isEmail(email);
+      if (!isEmail) {
+        res.status(400).json({ status: false, message: "Provide valid email !" });
+      }
+
+      // Check for duplicate username or email
+      const duplicateUser = await userService.getUserByUsername(user);
+      const duplicateEmail = await userService.getUserByEmail(email);
+
+      if (duplicateUser || duplicateEmail) {
+        // Conflict
+        res.status(409).json({ status: false, message: "User already exits !" });
+      }
+
+      // Encrypt Password
+      const hashedPwd = await bcrypt.hash(pwd, 12);
+
+      // Create and store new user
+      const result = await userService.createUser({
+        username: user,
+        password: hashedPwd,
+        email: email,
+      });
+
+      // Send Response
+      if (result) {
+        return res.status(201).json({
+          status: true,
+          success: `New user created!`,
+        });
+      } else {
+        throw new Error("Something went wrong !");
+      }
+    } catch (error) {
+      next(error);
     }
+  },
 
-    // Generating Tokens
-    const accessToken = jwt.sign(
-      {
+  // Login User
+  loginUser: async (
+    req: TypedRequestBody<{
+      user: string;
+      pwd: string;
+    }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { user, pwd } = req.body;
+
+    try {
+      // Check username and password
+      if (!user || !pwd)
+        return res.status(400).json({
+          status: false,
+          message: "Username and Password are required !",
+        });
+
+      // Check User existence
+      const foundUser = await userService.getUserByUsername(user);
+
+      if (!foundUser) {
+        // No User
+        return res.status(400).json({
+          status: false,
+          message: "Invalid Username !",
+        });
+      }
+
+      // Check Password
+      const match = await bcrypt.compare(pwd, foundUser.password);
+      if (!match) {
+        return res.status(400).json({
+          status: false,
+          message: "Incorrect Password !",
+        });
+      }
+
+      // Access Token
+      const tokenPayload: JwtPayload = {
         user: {
-          _id: foundUser._id.toString(),
           username: foundUser.username,
           role: foundUser.role,
         },
-      },
-      config.jwtSecret,
-      { expiresIn: "30s" },
-    );
+      };
+      const accessToken = generateAccessToken(tokenPayload);
+      if (!accessToken) {
+        throw new Error("Something went wrong !");
+      }
 
-    const refreshToken = jwt.sign({ username: foundUser.username }, config.jwtSecret, {
-      expiresIn: "1d",
-    });
+      // Refresh Token
+      const refreshTokenPayload: RefreshTokenPayLoad = {
+        username: foundUser.username,
+      };
+      const refreshToken = generateRefreshToken(refreshTokenPayload);
+      if (!refreshToken) {
+        throw new Error("Something went wrong !");
+      }
 
-    // Save RefreshToken in Database
-    foundUser.refreshToken = refreshToken;
-    const result = await foundUser.save();
+      // Save RefreshToken in Database
+      foundUser.refreshToken = refreshToken;
+      const result = await foundUser.save();
 
-    if (result) {
-      res.cookie("jwt", refreshToken, {
+      if (result) {
+        res.cookie("jwt", refreshToken, {
+          httpOnly: true,
+          maxAge: 24 * 60 * 60 * 1000,
+          // sameSite: "none",
+          // secure: true,
+        });
+
+        return res.status(201).json({
+          status: true,
+          accessToken,
+        });
+      } else {
+        throw new Error("Something went wrong !");
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // Logout
+  logoutUser: async (req: TypedRequestCookies, res: Response, next: NextFunction) => {
+    const cookies = req.cookies;
+    try {
+      // No Content
+      if (!cookies?.jwt) return res.sendStatus(204);
+      const refreshToken = cookies.jwt;
+
+      // Check user existence with refresh token
+      const foundUser = await userService.getUserByProperty({ refreshToken });
+
+      // If user not found
+      if (!foundUser) {
+        res.clearCookie("jwt", {
+          httpOnly: true,
+          // sameSite: "none",
+          // secure: true,
+        });
+        return res.sendStatus(204);
+      }
+
+      // If user found
+      foundUser.refreshToken = "";
+      await foundUser.save();
+      res.clearCookie("jwt", {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
         // sameSite: "none",
         // secure: true,
       });
-      return res.status(201).json({ status: true, accessToken });
-    } else {
-      throw new ErrorHandler("Something went wrong !", 500);
+      return res.sendStatus(204);
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
-  }
-});
+  },
 
-// Logout
-export const logoutUser = TryCatch(async (req, res) => {
-  const cookies = req.cookies;
-  if (!cookies?.jwt) return res.sendStatus(204); // No Content
-  const refreshToken = cookies.jwt;
-  // Check user existence with refresh token
-  const foundUser = await User.findOne({ refreshToken }).exec();
-  if (!foundUser) {
-    res.clearCookie("jwt", { httpOnly: true }); // sameSite: "None", secure: true
-    return res.sendStatus(204);
-  }
-  foundUser.refreshToken = "";
-  await foundUser.save();
-  res.clearCookie("jwt", { httpOnly: true }); // sameSite: "None", secure: true
-  return res.sendStatus(204);
-});
+  // Refresh Token
+  refreshAccessToken: async (req: TypedRequestCookies, res: Response, next: NextFunction) => {
+    const cookies = req.cookies;
+    try {
+      if (!cookies?.jwt) return res.sendStatus(401);
+      const refreshToken = cookies.jwt;
 
-// Refresh
-export const refreshAccessToken = TryCatch(async (req, res, next) => {
-  const cookies = req.cookies;
-  if (!cookies?.jwt) return res.sendStatus(401);
-  const refreshToken = cookies.jwt;
-  // Check user existence with refresh token
-  const foundUser = await User.findOne({ refreshToken }).exec();
-  if (!foundUser) return res.status(403); // Forbidden
+      // Check user existence with refresh token
+      const foundUser = await userService.getUserByProperty({ refreshToken });
+      if (!foundUser) return res.status(403); // Forbidden
 
-  // Validate refresh token
-  const decoded = jwt.verify(refreshToken, config.jwtSecret);
+      // Validate refresh token
+      const decoded = verifyToken<RefreshTokenPayLoad>(refreshToken);
 
-  if (typeof decoded === "string") {
-    return next(new ErrorHandler("Invalid token payload", 403));
-  }
-  const decodedUser = decoded?.user;
-  if (!decodedUser?.username || !decodedUser?.role) {
-    return next(new ErrorHandler("Invalid token payload", 403));
-  }
+      // Forbidden (invalid token)
+      if (typeof decoded === "string") {
+        return res.sendStatus(403);
+      }
+      if (!decoded?.username) {
+        return res.sendStatus(403);
+      }
 
-  if (foundUser.username !== decoded.username) {
-    return res.sendStatus(403); // Forbidden (invalid token)
-  }
+      if (foundUser.username !== decoded.username) {
+        return res.sendStatus(403);
+      }
 
-  // Generate a new access token
-  const accessToken = jwt.sign(
-    {
-      userInfo: {
-        username: foundUser.username,
-        role: foundUser.role,
-      },
-    },
-    process.env.TOKEN_SECRET || "",
-    { expiresIn: "15m" },
-  );
+      // Generate a new access token
+      const tokenPayload: JwtPayload = {
+        user: {
+          username: foundUser.username,
+          role: foundUser.role,
+        },
+      };
+      const accessToken = generateAccessToken(tokenPayload);
+      if (!accessToken) {
+        throw new Error("Something went wrong !");
+      }
 
-  res.status(201).json({ accessToken });
-});
+      res.status(201).json({
+        status: true,
+        accessToken: accessToken,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+};
+
+export default AuthController;

@@ -1,7 +1,7 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Model } from "mongoose";
 
-export interface UserProfile extends Document {
-  user_id: mongoose.Types.ObjectId;
+export interface IUserProfile {
+  user: mongoose.Types.ObjectId;
   name: string;
   address: {
     street: string;
@@ -15,13 +15,15 @@ export interface UserProfile extends Document {
   gender?: "male" | "female" | "trans";
   dob?: Date | undefined;
   age?: number | undefined; // Virtual Attribute
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const schema = new Schema<UserProfile>(
+export interface IUserProfileDocument extends Document, IUserProfile {}
+
+const schema = new Schema<IUserProfileDocument>(
   {
-    user_id: { type: Schema.Types.ObjectId, required: true, unique: true },
+    user: { type: Schema.Types.ObjectId, required: true, unique: true },
     name: {
       type: String,
       required: [true, "Please enter full name"],
@@ -65,4 +67,7 @@ schema.virtual("age").get(function () {
   }
 });
 
-export const UserProfile = mongoose.model<UserProfile>("UserProfile", schema);
+export const UserProfile: Model<IUserProfileDocument> = mongoose.model<IUserProfileDocument>(
+  "UserProfile",
+  schema,
+);

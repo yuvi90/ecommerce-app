@@ -1,48 +1,72 @@
-import jwt from "jsonwebtoken";
-import ErrorHandler from "../utils/utility-class.js";
-import { User } from "../models/user.js";
-import { TryCatch } from "./error.js";
-import config from "@config/index.js";
+import { Response, NextFunction } from "express";
+// Importing Locals
+import userService from "../services/useService.js";
+import { verifyToken } from "../utils/helpers.js";
+
+// Types
+import { JwtPayload, AuthUserRequest } from "../types/types.js";
 
 // Authentication Middleware
-export const verifyJWT = TryCatch((req, res, next) => {
-  // Extract Token from header
-  const authHeader: string | undefined = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
-    return next(new ErrorHandler("Unauthorized!", 401));
+export const authenticate = async (req: AuthUserRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  try {
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({
+        status: false,
+        message: "Unauthorized!",
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = verifyToken<JwtPayload>(token);
+
+    if (
+      !decoded ||
+      !("user" in decoded) ||
+      !("username" in decoded.user) ||
+      !("role" in decoded.user)
+    ) {
+      return res.status(403).json({
+        status: false,
+        message: "Invalid token payload",
+      });
+    }
+
+    req.user = decoded.user;
+    next();
+  } catch (error) {
+    next(error);
   }
-  const token = authHeader.split(" ")[1];
+};
 
-  // Verify Token
-  jwt.verify(token, config.jwtSecret, (err, decoded) => {
-    if (err) {
-      return next(new ErrorHandler("Forbidden", 403));
-    }
-    // Use a type guard to ensure that decoded is of type JwtPayload
-    if (typeof decoded === "string") {
-      return next(new ErrorHandler("Invalid token payload", 403));
-    }
-    const decodedUser = decoded?.user;
-    if (!decodedUser?.username || !decodedUser?.role) {
-      return next(new ErrorHandler("Invalid token payload", 403));
-    }
+// Authorization Middleware
+export const adminOnly = async (req: AuthUserRequest, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user;
 
-    req.user = decodedUser;
+    if (!user?.username || !user?.role)
+      return res.status(401).json({
+        status: false,
+        message: "Authentication Required !",
+      });
+
+    const foundedUser = await userService.getUserByUsername(user.username);
+
+    if (!foundedUser)
+      return res.status(401).json({
+        status: false,
+        message: "Unauthorized !",
+      });
+
+    const allowedRoles = ["admin"];
+    if (!allowedRoles.includes(user.role))
+      return res.status(403).json({
+        status: false,
+        message: "Unauthorized !",
+      });
 
     next();
-  });
-});
-
-// Authorization
-export const adminOnly = TryCatch(async (req, res, next) => {
-  const { userId, role } = req.query;
-
-  if (!userId) return next(new ErrorHandler("Authentication Required !", 401));
-
-  const user = await User.findById(userId);
-  if (!user) return next(new ErrorHandler("Unauthorized !", 401));
-
-  if (user.role !== role && role !== "admin") return next(new ErrorHandler("Unauthorized !", 403));
-
-  next();
-});
+  } catch (error) {
+    next(error);
+  }
+};

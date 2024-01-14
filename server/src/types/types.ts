@@ -1,13 +1,23 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
-// User Request Body
-export interface NewUserRequestBody {
-  name: string;
-  email: string;
-  photo: string;
-  gender: string;
-  _id: string;
-  dob: Date;
+// Controller Type
+export type ControllerType = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Promise<void | Response<unknown, Record<string, unknown>>>;
+
+// AccessToken Payload
+export interface JwtPayload {
+  user: { username: string; role?: string };
+}
+// RefreshToken Payload
+export interface RefreshTokenPayLoad {
+  username: string;
+}
+// Authenticate User Request Body
+export interface AuthUserRequest extends Request {
+  user?: { username: string; role?: string };
 }
 
 // Product Request Body
@@ -17,13 +27,6 @@ export interface NewProductRequestBody {
   price: number;
   stock: number;
 }
-
-// Controller Type
-export type ControllerType = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => Promise<void | Response<unknown, Record<string, unknown>>>;
 
 // Search Request Params
 export type SearchRequestQuery = {

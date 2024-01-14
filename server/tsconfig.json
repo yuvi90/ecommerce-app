@@ -11,22 +11,19 @@
     "sourceMap": true,
     "strict": true,
     "skipLibCheck": true,
-    "noEmitOnError": false,
-    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": false,
     "allowJs": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
-    "removeComments": true,
+    "removeComments": true
 
     /* Paths Alias */
-    "baseUrl": "./src",
-    "paths": {
-      "@src/*": ["*"],
-      "@config/*": ["./config/*"]
-    }
+    // "baseUrl": ".",
+    // "paths": {}
   },
 
   /* Files to Include */

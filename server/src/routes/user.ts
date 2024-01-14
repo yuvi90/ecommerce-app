@@ -1,16 +1,26 @@
 import express from "express";
-import { deleteUser, getAllUsers, getUser, newUser } from "../controllers/user.js";
-import { adminOnly } from "../middlewares/auth.js";
+import { authenticate, adminOnly } from "../middlewares/auth.js";
+import UserController from "../controllers/user.js";
+import ProfileController from "../controllers/userProfile.js";
 
-const app = express.Router();
+const router = express.Router();
 
-// Route - /api/user/new
-app.post("/new", newUser);
+// Apply authenticate middleware to all routes in the router
+router.use(authenticate);
 
 // Route - /api/user/all
-app.get("/all", adminOnly, getAllUsers);
+router.get("/all", adminOnly, UserController.getAllUsers);
 
-// Route - /api/user/dynamicID
-app.route("/:id").get(getUser).delete(adminOnly, deleteUser);
+// Route - /api/user/:id
+router.route("/:id").get(UserController.getUser);
 
-export default app;
+// Route - /api/user/:id
+router.route("/:id").delete(adminOnly, UserController.deleteUser);
+
+// Route - /api/user/:id/profile
+router.route("/:id/profile").post(ProfileController.createNewProfile);
+
+// Route - /api/user/:id/profile
+router.route("/:id/profile").get(ProfileController.getProfile);
+
+export default router;

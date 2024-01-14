@@ -1,16 +1,18 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Model } from "mongoose";
 import validator from "validator";
 
-export interface IUser extends Document {
+export interface IUser {
   username: string;
   password: string;
   email: string;
-  role: "admin" | "user";
-  createdAt: Date;
+  role?: "admin" | "user";
+  createdAt?: Date;
   refreshToken?: string;
 }
 
-const UserSchema = new Schema<IUser>({
+export interface IUserDocument extends Document, IUser {}
+
+const UserSchema = new Schema<IUserDocument>({
   username: {
     type: String,
     unique: true,
@@ -37,4 +39,4 @@ const UserSchema = new Schema<IUser>({
   refreshToken: { type: String },
 });
 
-export const User = mongoose.model<IUser>("User", UserSchema);
+export const User: Model<IUserDocument> = mongoose.model<IUserDocument>("User", UserSchema);

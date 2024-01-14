@@ -15,8 +15,10 @@ export const errorMiddleware = (
 
   if (err.name === "CastError") err.message = "Invalid ID";
 
+  console.log(err);
+
   return res.status(err.statusCode).json({
-    success: false,
+    status: false,
     message: err.message,
   });
 };
