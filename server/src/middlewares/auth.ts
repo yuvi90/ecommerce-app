@@ -18,7 +18,7 @@ export const authenticate = async (req: AuthUserRequest, res: Response, next: Ne
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = verifyToken<JwtPayload>(token);
+    const decoded = verifyToken<JwtPayload>(token, "access");
 
     if (
       !decoded ||

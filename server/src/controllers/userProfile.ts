@@ -7,15 +7,9 @@ interface TypedRequestBody<T> extends Request {
 }
 
 const ProfileController = {
-  getProfile: async (
-    req: Request & {
-      query: { userId?: string };
-    },
-    res: Response,
-    next: NextFunction,
-  ) => {
+  getProfile: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.query.userId;
+      const userId = req.params.id;
 
       if (!userId) {
         return res.status(400).json({
@@ -38,12 +32,13 @@ const ProfileController = {
   },
 
   createNewProfile: async (
-    req: TypedRequestBody<{ userId: string } & Partial<IUserProfile>>,
+    req: TypedRequestBody<Partial<IUserProfile>>,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const { userId, ...profileData } = req.body;
+      const userId = req.params.id;
+      const { ...profileData } = req.body;
 
       if (
         !userId ||

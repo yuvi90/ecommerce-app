@@ -205,7 +205,7 @@ const AuthController = {
       if (!foundUser) return res.status(403); // Forbidden
 
       // Validate refresh token
-      const decoded = verifyToken<RefreshTokenPayLoad>(refreshToken);
+      const decoded = verifyToken<RefreshTokenPayLoad>(refreshToken, "refresh");
 
       // Forbidden (invalid token)
       if (typeof decoded === "string") {
@@ -214,8 +214,7 @@ const AuthController = {
       if (!decoded?.username) {
         return res.sendStatus(403);
       }
-
-      if (foundUser.username !== decoded.username) {
+      if (foundUser.username != decoded?.username) {
         return res.sendStatus(403);
       }
 

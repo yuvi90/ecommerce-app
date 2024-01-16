@@ -20,14 +20,6 @@ export interface AuthUserRequest extends Request {
   user?: { username: string; role?: string };
 }
 
-// Product Request Body
-export interface NewProductRequestBody {
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-}
-
 // Search Request Params
 export type SearchRequestQuery = {
   search?: string;
@@ -37,7 +29,7 @@ export type SearchRequestQuery = {
   page?: string;
 };
 
-// Base Request Params
+// BaseQuery Params
 export interface BaseQuery {
   name?: {
     $regex: string;

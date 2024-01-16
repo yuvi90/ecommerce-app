@@ -20,8 +20,8 @@ const UserController = {
   },
 
   // Get single user
-  getUser: async (req: Request & { query: { id?: string } }, res: Response, next: NextFunction) => {
-    const { id } = req.query;
+  getUser: async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
     try {
       if (!id) {
         return res.status(400).json({
@@ -47,12 +47,8 @@ const UserController = {
   },
 
   // Delete user
-  deleteUser: async (
-    req: Request & { query: { id?: string } },
-    res: Response,
-    next: NextFunction,
-  ) => {
-    const { id } = req.query;
+  deleteUser: async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
     try {
       if (!id) {
         return res.status(400).json({
