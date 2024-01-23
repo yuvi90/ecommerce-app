@@ -6,7 +6,7 @@ import { Column } from "react-table";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import TableHOC from "../../components/admin/TableHOC";
 import { Skeleton } from "../../components/loader";
-import { useAllOrdersQuery } from "../../redux/api/orderAPI";
+import { useAllOrdersQuery } from "../../features/orders/orderAPI";
 import { RootState } from "../../redux/store";
 import { CustomError } from "../../types/api-types";
 
@@ -69,18 +69,14 @@ const Transaction = () => {
           status: (
             <span
               className={
-                i.status === "Processing"
-                  ? "red"
-                  : i.status === "Shipped"
-                  ? "green"
-                  : "purple"
+                i.status === "Processing" ? "red" : i.status === "Shipped" ? "green" : "purple"
               }
             >
               {i.status}
             </span>
           ),
           action: <Link to={`/admin/transaction/${i._id}`}>Manage</Link>,
-        }))
+        })),
       );
   }, [data]);
 
@@ -89,7 +85,7 @@ const Transaction = () => {
     rows,
     "dashboard-product-box",
     "Transactions",
-    rows.length > 6
+    rows.length > 6,
   )();
   return (
     <div className="admin-container">

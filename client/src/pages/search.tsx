@@ -1,14 +1,11 @@
 import { useState } from "react";
 import ProductCard from "../components/product-card";
-import {
-  useCategoriesQuery,
-  useSearchProductsQuery,
-} from "../redux/api/productAPI";
+import { useCategoriesQuery, useSearchProductsQuery } from "../features/products/productAPI";
 import { CustomError } from "../types/api-types";
 import toast from "react-hot-toast";
 import { Skeleton } from "../components/loader";
 import { CartItem } from "../types/types";
-import { addToCart } from "../redux/reducer/cartReducer";
+import { addToCart } from "../features/cart/cartReducer";
 import { useDispatch } from "react-redux";
 
 const Search = () => {
@@ -63,7 +60,10 @@ const Search = () => {
         <h2>Filters</h2>
         <div>
           <h4>Sort</h4>
-          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
             <option value="">None</option>
             <option value="asc">Price (Low to High)</option>
             <option value="dsc">Price (High to Low)</option>
@@ -90,7 +90,10 @@ const Search = () => {
             <option value="">ALL</option>
             {!loadingCategories &&
               categoriesResponse?.categories.map((i) => (
-                <option key={i} value={i}>
+                <option
+                  key={i}
+                  value={i}
+                >
                   {i.toUpperCase()}
                 </option>
               ))}

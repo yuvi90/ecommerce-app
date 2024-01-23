@@ -12,6 +12,7 @@ import config from "./config/index.js";
 // Importing Routes
 import authRoute from "./routes/auth.js";
 import userRoute from "./routes/user.js";
+import productRoute from "./routes/products.js";
 
 // Connecting to Database
 connectDB(config.mongoURI);
@@ -27,7 +28,12 @@ const app = express();
 
 // Initializes Middlewares
 app.use(morgan("dev"));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -35,12 +41,13 @@ app.get("/", async (req, res) => {
   res.send("API Working");
 });
 
+// Public Uploads Folder
+app.use("/uploads", express.static("uploads"));
+
 // Using Routes
 app.use("/auth", authRoute);
 app.use("/api/user", userRoute);
-
-// Public Uploads Folder
-app.use("/uploads", express.static("uploads"));
+app.use("/api/product", productRoute);
 
 // Error Middleware
 app.use(errorMiddleware);

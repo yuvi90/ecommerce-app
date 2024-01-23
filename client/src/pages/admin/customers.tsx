@@ -6,10 +6,7 @@ import { Column } from "react-table";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import TableHOC from "../../components/admin/TableHOC";
 import { Skeleton } from "../../components/loader";
-import {
-  useAllUsersQuery,
-  useDeleteUserMutation,
-} from "../../redux/api/userAPI";
+import { useAllUsersQuery, useDeleteUserMutation } from "../../features/users/userAPI";
 import { RootState } from "../../redux/store";
 import { CustomError } from "../../types/api-types";
 import { responseToast } from "../../utils/features";
@@ -91,7 +88,7 @@ const Customers = () => {
               <FaTrash />
             </button>
           ),
-        }))
+        })),
       );
   }, [data]);
 
@@ -100,7 +97,7 @@ const Customers = () => {
     rows,
     "dashboard-product-box",
     "Customers",
-    rows.length > 6
+    rows.length > 6,
   )();
 
   return (

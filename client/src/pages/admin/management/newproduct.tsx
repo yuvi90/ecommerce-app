@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
-import { useNewProductMutation } from "../../../redux/api/productAPI";
+import { useNewProductMutation } from "../../../features/products/productAPI";
 import { RootState } from "../../../redux/store";
 import { responseToast } from "../../../utils/features";
 
@@ -104,10 +104,19 @@ const NewProduct = () => {
 
             <div>
               <label>Photo</label>
-              <input required type="file" onChange={changeImageHandler} />
+              <input
+                required
+                type="file"
+                onChange={changeImageHandler}
+              />
             </div>
 
-            {photoPrev && <img src={photoPrev} alt="New Image" />}
+            {photoPrev && (
+              <img
+                src={photoPrev}
+                alt="New Image"
+              />
+            )}
             <button type="submit">Create</button>
           </form>
         </article>

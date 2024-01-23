@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
 import { DoughnutChart, PieChart } from "../../../components/admin/Charts";
 import { Skeleton } from "../../../components/loader";
-import { usePieQuery } from "../../../redux/api/dashboardAPI";
+import { usePieQuery } from "../../../features/dashboard/dashboardAPI";
 import { RootState } from "../../../redux/store";
 
 const PieCharts = () => {
@@ -35,11 +35,7 @@ const PieCharts = () => {
                 <PieChart
                   labels={["Processing", "Shipped", "Delivered"]}
                   data={[order.processing, order.shipped, order.delivered]}
-                  backgroundColor={[
-                    `hsl(110,80%, 80%)`,
-                    `hsl(110,80%, 50%)`,
-                    `hsl(110,40%, 50%)`,
-                  ]}
+                  backgroundColor={[`hsl(110,80%, 80%)`, `hsl(110,80%, 50%)`, `hsl(110,40%, 50%)`]}
                   offset={[0, 0, 50]}
                 />
               </div>
@@ -52,10 +48,7 @@ const PieCharts = () => {
                   labels={categories.map((i) => Object.keys(i)[0])}
                   data={categories.map((i) => Object.values(i)[0])}
                   backgroundColor={categories.map(
-                    (i) =>
-                      `hsl(${Object.values(i)[0] * 4}, ${
-                        Object.values(i)[0]
-                      }%, 50%)`
+                    (i) => `hsl(${Object.values(i)[0] * 4}, ${Object.values(i)[0]}%, 50%)`,
                   )}
                   legends={false}
                   offset={[0, 0, 0, 80]}
@@ -81,13 +74,7 @@ const PieCharts = () => {
             <section>
               <div>
                 <DoughnutChart
-                  labels={[
-                    "Marketing Cost",
-                    "Discount",
-                    "Burnt",
-                    "Production Cost",
-                    "Net Margin",
-                  ]}
+                  labels={["Marketing Cost", "Discount", "Burnt", "Production Cost", "Net Margin"]}
                   data={[
                     revenue.marketingCost,
                     revenue.discount,
@@ -112,11 +99,7 @@ const PieCharts = () => {
             <section>
               <div>
                 <PieChart
-                  labels={[
-                    "Teenager(Below 20)",
-                    "Adult (20-40)",
-                    "Older (above 40)",
-                  ]}
+                  labels={["Teenager(Below 20)", "Adult (20-40)", "Older (above 40)"]}
                   data={[ageGroup.teen, ageGroup.adult, ageGroup.old]}
                   backgroundColor={[
                     `hsl(10, ${80}%, 80%)`,

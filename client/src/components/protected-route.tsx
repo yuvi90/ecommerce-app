@@ -9,13 +9,7 @@ interface Props {
   redirect?: string;
 }
 
-const ProtectedRoute = ({
-  isAuthenticated,
-  children,
-  adminOnly,
-  admin,
-  redirect = "/",
-}: Props) => {
+const ProtectedRoute = ({ isAuthenticated, children, adminOnly, admin, redirect = "/" }: Props) => {
   if (!isAuthenticated) return <Navigate to={redirect} />;
 
   if (adminOnly && !admin) return <Navigate to={redirect} />;

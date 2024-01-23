@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Column } from "react-table";
 import TableHOC from "../components/admin/TableHOC";
 import { Skeleton } from "../components/loader";
-import { useMyOrdersQuery } from "../redux/api/orderAPI";
+import { useMyOrdersQuery } from "../features/orders/orderAPI";
 import { RootState } from "../redux/store";
 import { CustomError } from "../types/api-types";
 
@@ -68,18 +68,14 @@ const Orders = () => {
           status: (
             <span
               className={
-                i.status === "Processing"
-                  ? "red"
-                  : i.status === "Shipped"
-                  ? "green"
-                  : "purple"
+                i.status === "Processing" ? "red" : i.status === "Shipped" ? "green" : "purple"
               }
             >
               {i.status}
             </span>
           ),
           action: <Link to={`/admin/transaction/${i._id}`}>Manage</Link>,
-        }))
+        })),
       );
   }, [data]);
 
@@ -88,7 +84,7 @@ const Orders = () => {
     rows,
     "dashboard-product-box",
     "Orders",
-    rows.length > 6
+    rows.length > 6,
   )();
   return (
     <div className="container">

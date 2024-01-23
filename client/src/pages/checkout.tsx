@@ -1,16 +1,11 @@
-import {
-  Elements,
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useNewOrderMutation } from "../redux/api/orderAPI";
-import { resetCart } from "../redux/reducer/cartReducer";
+import { useNewOrderMutation } from "../features/orders/orderAPI";
+import { resetCart } from "../features/cart/cartReducer";
 import { RootState } from "../redux/store";
 import { NewOrderRequest } from "../types/api-types";
 import { responseToast } from "../utils/features";
@@ -25,15 +20,9 @@ const CheckOutForm = () => {
 
   const { user } = useSelector((state: RootState) => state.userReducer);
 
-  const {
-    shippingInfo,
-    cartItems,
-    subtotal,
-    tax,
-    discount,
-    shippingCharges,
-    total,
-  } = useSelector((state: RootState) => state.cartReducer);
+  const { shippingInfo, cartItems, subtotal, tax, discount, shippingCharges, total } = useSelector(
+    (state: RootState) => state.cartReducer,
+  );
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -78,7 +67,10 @@ const CheckOutForm = () => {
     <div className="checkout-container">
       <form onSubmit={submitHandler}>
         <PaymentElement />
-        <button type="submit" disabled={isProcessing}>
+        <button
+          type="submit"
+          disabled={isProcessing}
+        >
           {isProcessing ? "Processing..." : "Pay"}
         </button>
       </form>

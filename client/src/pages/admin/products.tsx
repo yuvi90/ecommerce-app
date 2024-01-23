@@ -7,7 +7,7 @@ import { Column } from "react-table";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import TableHOC from "../../components/admin/TableHOC";
 import { Skeleton } from "../../components/loader";
-import { useAllProductsQuery } from "../../redux/api/productAPI";
+import { useAllProductsQuery } from "../../features/products/productAPI";
 import { RootState, server } from "../../redux/store";
 import { CustomError } from "../../types/api-types";
 
@@ -63,7 +63,7 @@ const Products = () => {
           price: i.price,
           stock: i.stock,
           action: <Link to={`/admin/product/${i._id}`}>Manage</Link>,
-        }))
+        })),
       );
   }, [data]);
 
@@ -72,14 +72,17 @@ const Products = () => {
     rows,
     "dashboard-product-box",
     "Products",
-    rows.length > 6
+    rows.length > 6,
   )();
 
   return (
     <div className="admin-container">
       <AdminSidebar />
       <main>{isLoading ? <Skeleton length={20} /> : Table}</main>
-      <Link to="/admin/product/new" className="create-product-btn">
+      <Link
+        to="/admin/product/new"
+        className="create-product-btn"
+      >
         <FaPlus />
       </Link>
     </div>

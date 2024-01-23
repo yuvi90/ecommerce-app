@@ -8,7 +8,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import { BarChart, DoughnutChart } from "../../components/admin/Charts";
 import Table from "../../components/admin/DashboardTable";
 import { Skeleton } from "../../components/loader";
-import { useStatsQuery } from "../../redux/api/dashboardAPI";
+import { useStatsQuery } from "../../features/dashboard/dashboardAPI";
 import { RootState } from "../../redux/store";
 import { getLastMonths } from "../../utils/features";
 
@@ -36,9 +36,15 @@ const Dashboard = () => {
           <>
             <div className="bar">
               <BsSearch />
-              <input type="text" placeholder="Search for data, users, docs" />
+              <input
+                type="text"
+                placeholder="Search for data, users, docs"
+              />
               <FaRegBell />
-              <img src={user?.photo || userImg} alt="User" />
+              <img
+                src={user?.photo || userImg}
+                alt="User"
+              />
             </div>
 
             <section className="widget-container">
@@ -109,10 +115,7 @@ const Dashboard = () => {
                 <DoughnutChart
                   labels={["Female", "Male"]}
                   data={[stats.userRatio.female, stats.userRatio.male]}
-                  backgroundColor={[
-                    "hsl(340, 82%, 56%)",
-                    "rgba(53, 162, 235, 0.8)",
-                  ]}
+                  backgroundColor={["hsl(340, 82%, 56%)", "rgba(53, 162, 235, 0.8)"]}
                   cutout={90}
                 />
                 <p>
@@ -136,13 +139,7 @@ interface WidgetItemProps {
   amount?: boolean;
 }
 
-const WidgetItem = ({
-  heading,
-  value,
-  percent,
-  color,
-  amount = false,
-}: WidgetItemProps) => (
+const WidgetItem = ({ heading, value, percent, color, amount = false }: WidgetItemProps) => (
   <article className="widget">
     <div className="widget-info">
       <p>{heading}</p>

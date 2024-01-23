@@ -1,58 +1,39 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
-import { FcGoogle } from "react-icons/fc";
-import { auth } from "../firebase";
-import { getUser, useLoginMutation } from "../redux/api/userAPI";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
-import { MessageResponse } from "../types/api-types";
-import { userExist, userNotExist } from "../redux/reducer/userReducer";
-import { useDispatch } from "react-redux";
+// import { getUser } from "../features/users/userAPI";
+
+import { setCredentials, useLoginMutation } from "../features/auth";
+import { useAppDispatch } from "../redux/hooks";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const dispatch = useDispatch();
-  const [gender, setGender] = useState("");
-  const [date, setDate] = useState("");
+  const [user, setUser] = useState("");
+  const [pwd, setPwd] = useState("");
+
+  const navigate = useNavigate();
 
   const [login] = useLoginMutation();
+  const dispatch = useAppDispatch();
 
-  const loginHandler = async () => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     try {
-      const provider = new GoogleAuthProvider();
-      const { user } = await signInWithPopup(auth, provider);
+      const userData = await login({ user, pwd }).unwrap();
+      console.log(userData);
 
-      console.log({
-        name: user.displayName!,
-        email: user.email!,
-        photo: user.photoURL!,
-        gender,
-        role: "user",
-        dob: date,
-        _id: user.uid,
-      });
-
-      const res = await login({
-        name: user.displayName!,
-        email: user.email!,
-        photo: user.photoURL!,
-        gender,
-        role: "user",
-        dob: date,
-        _id: user.uid,
-      });
-
-      if ("data" in res) {
-        toast.success(res.data.message);
-        const data = await getUser(user.uid);
-        dispatch(userExist(data?.user!));
+      if (userData.status) {
+        toast.success("Success");
+        dispatch(setCredentials({ ...userData, user }));
+        setUser("");
+        setPwd("");
+        navigate("/");
       } else {
-        const error = res.error as FetchBaseQueryError;
-        const message = (error.data as MessageResponse).message;
-        toast.error(message);
-        dispatch(userNotExist());
+        toast.error("Sign In Fail");
       }
-    } catch (error) {
+    } catch (err) {
       toast.error("Sign In Fail");
+      console.log(err);
     }
   };
 
@@ -60,31 +41,30 @@ const Login = () => {
     <div className="login">
       <main>
         <h1 className="heading">Login</h1>
-
-        <div>
-          <label>Gender</label>
-          <select value={gender} onChange={(e) => setGender(e.target.value)}>
-            <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Date of birth</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <p>Already Signed In Once</p>
-          <button onClick={loginHandler}>
-            <FcGoogle /> <span>Sign in with Google</span>
-          </button>
-        </div>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="username">Username:</label>
+          <div>
+            <input
+              type="text"
+              id="username"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
+              autoComplete="off"
+              required
+            />
+          </div>
+          <label htmlFor="password">Password:</label>
+          <div>
+            <input
+              type="password"
+              id="password"
+              onChange={(e) => setPwd(e.target.value)}
+              value={pwd}
+              required
+            />
+          </div>
+          <button>Sign In</button>
+        </form>
       </main>
     </div>
   );

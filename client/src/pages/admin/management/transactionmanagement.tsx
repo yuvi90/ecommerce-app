@@ -7,7 +7,7 @@ import {
   useDeleteOrderMutation,
   useOrderDetailsQuery,
   useUpdateOrderMutation,
-} from "../../../redux/api/orderAPI";
+} from "../../../features/orders/orderAPI";
 import { RootState, server } from "../../../redux/store";
 import { Order, OrderItem } from "../../../types/types";
 import { responseToast } from "../../../utils/features";
@@ -101,16 +101,16 @@ const TransactionManagement = () => {
             </section>
 
             <article className="shipping-info-card">
-              <button className="product-delete-btn" onClick={deleteHandler}>
+              <button
+                className="product-delete-btn"
+                onClick={deleteHandler}
+              >
                 <FaTrash />
               </button>
               <h1>Order Info</h1>
               <h5>User Info</h5>
               <p>Name: {name}</p>
-              <p>
-                Address:{" "}
-                {`${address}, ${city}, ${state}, ${country} ${pinCode}`}
-              </p>
+              <p>Address: {`${address}, ${city}, ${state}, ${country} ${pinCode}`}</p>
               <h5>Amount Info</h5>
               <p>Subtotal: {subtotal}</p>
               <p>Shipping Charges: {shippingCharges}</p>
@@ -123,17 +123,16 @@ const TransactionManagement = () => {
                 Status:{" "}
                 <span
                   className={
-                    status === "Delivered"
-                      ? "purple"
-                      : status === "Shipped"
-                      ? "green"
-                      : "red"
+                    status === "Delivered" ? "purple" : status === "Shipped" ? "green" : "red"
                   }
                 >
                   {status}
                 </span>
               </p>
-              <button className="shipping-btn" onClick={updateHandler}>
+              <button
+                className="shipping-btn"
+                onClick={updateHandler}
+              >
                 Process Status
               </button>
             </article>
@@ -144,15 +143,12 @@ const TransactionManagement = () => {
   );
 };
 
-const ProductCard = ({
-  name,
-  photo,
-  price,
-  quantity,
-  productId,
-}: OrderItem) => (
+const ProductCard = ({ name, photo, price, quantity, productId }: OrderItem) => (
   <div className="transaction-product-card">
-    <img src={photo} alt={name} />
+    <img
+      src={photo}
+      alt={name}
+    />
     <Link to={`/product/${productId}`}>{name}</Link>
     <span>
       ₹{price} X {quantity} = ₹{price * quantity}

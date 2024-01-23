@@ -8,7 +8,7 @@ import {
   useDeleteProductMutation,
   useProductDetailsQuery,
   useUpdateProductMutation,
-} from "../../../redux/api/productAPI";
+} from "../../../features/products/productAPI";
 import { RootState, server } from "../../../redux/store";
 import { responseToast } from "../../../utils/features";
 
@@ -61,8 +61,7 @@ const Productmanagement = () => {
 
     if (nameUpdate) formData.set("name", nameUpdate);
     if (priceUpdate) formData.set("price", priceUpdate.toString());
-    if (stockUpdate !== undefined)
-      formData.set("stock", stockUpdate.toString());
+    if (stockUpdate !== undefined) formData.set("stock", stockUpdate.toString());
     if (photoFile) formData.set("photo", photoFile);
     if (categoryUpdate) formData.set("category", categoryUpdate);
 
@@ -105,7 +104,10 @@ const Productmanagement = () => {
           <>
             <section>
               <strong>ID - {data?.product._id}</strong>
-              <img src={`${server}/${photo}`} alt="Product" />
+              <img
+                src={`${server}/${photo}`}
+                alt="Product"
+              />
               <p>{name}</p>
               {stock > 0 ? (
                 <span className="green">{stock} Available</span>
@@ -115,7 +117,10 @@ const Productmanagement = () => {
               <h3>₹{price}</h3>
             </section>
             <article>
-              <button className="product-delete-btn" onClick={deleteHandler}>
+              <button
+                className="product-delete-btn"
+                onClick={deleteHandler}
+              >
                 <FaTrash />
               </button>
               <form onSubmit={submitHandler}>
@@ -160,10 +165,18 @@ const Productmanagement = () => {
 
                 <div>
                   <label>Photo</label>
-                  <input type="file" onChange={changeImageHandler} />
+                  <input
+                    type="file"
+                    onChange={changeImageHandler}
+                  />
                 </div>
 
-                {photoUpdate && <img src={photoUpdate} alt="New Image" />}
+                {photoUpdate && (
+                  <img
+                    src={photoUpdate}
+                    alt="New Image"
+                  />
+                )}
                 <button type="submit">Update</button>
               </form>
             </article>

@@ -4,13 +4,11 @@ import toast from "react-hot-toast";
 import { BiArrowBack } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { saveShippingInfo } from "../redux/reducer/cartReducer";
+import { saveShippingInfo } from "../features/cart/cartReducer";
 import { RootState, server } from "../redux/store";
 
 const Shipping = () => {
-  const { cartItems, total } = useSelector(
-    (state: RootState) => state.cartReducer
-  );
+  const { cartItems, total } = useSelector((state: RootState) => state.cartReducer);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -23,9 +21,7 @@ const Shipping = () => {
     pinCode: "",
   });
 
-  const changeHandler = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const changeHandler = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setShippingInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -44,7 +40,7 @@ const Shipping = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       navigate("/pay", {
@@ -62,7 +58,10 @@ const Shipping = () => {
 
   return (
     <div className="shipping">
-      <button className="back-btn" onClick={() => navigate("/cart")}>
+      <button
+        className="back-btn"
+        onClick={() => navigate("/cart")}
+      >
         <BiArrowBack />
       </button>
 
