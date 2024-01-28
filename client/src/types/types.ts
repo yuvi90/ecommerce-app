@@ -27,11 +27,12 @@ export type ShippingInfo = {
 
 export type CartItem = {
   productId: string;
-  photo: string;
   name: string;
-  price: number;
   quantity: number;
   stock: number;
+  category: string;
+  price: number;
+  thumbnail?: string;
 };
 export type OrderItem = Omit<CartItem, "stock"> & { _id: string };
 

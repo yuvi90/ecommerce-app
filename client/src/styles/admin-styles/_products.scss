@@ -112,12 +112,7 @@
         }
 
         > input {
-          @include inputStyle(
-            100%,
-            1rem,
-            unset,
-            1px solid rgba(13, 13, 13, 0.196)
-          );
+          @include inputStyle(100%, 1rem, unset, 1px solid rgba(13, 13, 13, 0.196));
           border-radius: 5px;
         }
       }

@@ -13,10 +13,10 @@ import config from "./config/index.js";
 import authRoute from "./routes/auth.js";
 import userRoute from "./routes/user.js";
 import productRoute from "./routes/products.js";
+import orderRoute from "./routes/order.js";
 
 // Connecting to Database
 connectDB(config.mongoURI);
-
 // Initialize Stripe
 export const stripe = new Stripe(config.stripeKey);
 
@@ -48,6 +48,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/product", productRoute);
+app.use("/api/order", orderRoute);
 
 // Error Middleware
 app.use(errorMiddleware);

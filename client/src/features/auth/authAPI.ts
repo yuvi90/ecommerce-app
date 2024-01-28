@@ -19,7 +19,12 @@ export const authAPI = api.injectEndpoints({
         body: { ...credentials },
       }),
     }),
+    logout: builder.query<void, void>({
+      query: () => ({
+        url: "/auth/logout",
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = authAPI;
+export const { useLoginMutation, useLazyLogoutQuery } = authAPI;

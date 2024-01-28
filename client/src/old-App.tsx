@@ -3,22 +3,22 @@ import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Header from "./components/header/header";
-import Loader from "./components/loader";
-import ProtectedRoute from "./components/protected-route";
+import Header from "./components/header/Header";
+import Loader from "./components/Loader";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { auth } from "./firebase";
 import { getUser } from "./features/users/userAPI";
 import { userExist, userNotExist } from "./features/users/userReducer";
 import { RootState } from "./redux/store";
 
-const Home = lazy(() => import("./pages/home"));
+const Home = lazy(() => import("./pages/Home"));
 const Search = lazy(() => import("./pages/search"));
 const Cart = lazy(() => import("./pages/cart"));
 const Shipping = lazy(() => import("./pages/shipping"));
 const Login = lazy(() => import("./pages/login"));
 const Orders = lazy(() => import("./pages/orders"));
 const OrderDetails = lazy(() => import("./pages/order-details"));
-const NotFound = lazy(() => import("./pages/not-found"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 const Checkout = lazy(() => import("./pages/checkout"));
 
 // Admin Routes Importing

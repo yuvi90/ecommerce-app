@@ -1,24 +1,26 @@
 import { Suspense, lazy } from "react";
 import { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { Route, Router, Routes } from "react-router-dom";
-import Header from "./components/header/header";
-import Loader from "./components/loader";
-import ProtectedRoute from "./components/protected-route";
-import { RootState } from "./redux/store";
-import DefaultLayout from "./layout/DefaultLayout";
-import Layout from "./layout/layout";
+import { useSelector } from "react-redux";
+import { Route, Routes } from "react-router-dom";
 
-const Home = lazy(() => import("./pages/home"));
-const Search = lazy(() => import("./pages/search"));
-const Cart = lazy(() => import("./pages/cart"));
+import Loader from "./components/Loader";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { RootState } from "./redux/store";
+
+import Layout from "./layout/Layout";
+import ProductDetail from "./features/products/ProductDetail";
+
+const Home = lazy(() => import("./pages/Home"));
+// const Search = lazy(() => import("./pages/search"));
+// const Cart = lazy(() => import("./pages/cart"));
+const Cart = lazy(() => import("./features/cart/Cart"));
 // const Shipping = lazy(() => import("./pages/shipping"));
-const Login = lazy(() => import("./pages/login"));
+const Login = lazy(() => import("./pages/Login"));
 // const Orders = lazy(() => import("./pages/orders"));
-const NotFound = lazy(() => import("./pages/not-found"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const App = () => {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector((state: RootState) => state.authReducer.user);
   const loading = false;
 
   return loading ? (
@@ -49,10 +51,16 @@ const App = () => {
             <Route
               path="/login"
               element={
-                <ProtectedRoute isAuthenticated={user ? false : true}>
-                  <Login />
-                </ProtectedRoute>
+                // <ProtectedRoute isAuthenticated={user ? false : true}>
+                <Login />
+                // </ProtectedRoute>
               }
+            />
+
+            {/* Product Page */}
+            <Route
+              path="/product/:id"
+              element={<ProductDetail />}
             />
 
             {/* Error */}
@@ -65,7 +73,7 @@ const App = () => {
       </Suspense>
 
       {/* Toast Notification */}
-      {/* <Toaster position="bottom-center" /> */}
+      <Toaster position="bottom-center" />
     </>
   );
 };

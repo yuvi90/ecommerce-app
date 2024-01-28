@@ -7,7 +7,7 @@ import { productAPI } from "../features/products/productAPI";
 import { authReducer } from "../features/auth";
 import { api } from "./api/api";
 // import { userReducer } from "../features/users/userReducer";
-// import { cartReducer } from "../features/cart/cartReducer";
+import { cartReducer } from "../features/cart/cartReducer";
 
 export const server = import.meta.env.VITE_SERVER;
 
@@ -21,7 +21,7 @@ export const store = configureStore({
     // Reducer
     [authReducer.name]: authReducer.reducer,
     // [userReducer.name]: userReducer.reducer,
-    // [cartReducer.name]: cartReducer.reducer,
+    [cartReducer.name]: cartReducer.reducer,
   },
   middleware: (mid) => [
     ...mid(),

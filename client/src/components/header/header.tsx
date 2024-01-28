@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaShoppingBag, FaSignInAlt, FaUser } from "react-icons/fa";
+// Icons
+import { SlLogin } from "react-icons/sl";
+import { HiOutlineShoppingBag } from "react-icons/hi2";
+import { FaRegUser } from "react-icons/fa6";
+import { RxCross1 } from "react-icons/rx";
+import { AiOutlineMenu } from "react-icons/ai";
+
 import toast from "react-hot-toast";
 
-import Menu, { Data } from "./menu/menu";
-import { selectCurrentUser } from "../../features/auth";
-import { useAppSelector } from "../../redux/hooks";
+import Menu, { Data } from "./menu/Menu";
+import { selectCurrentUser, useLazyLogoutQuery, logOut } from "../../features/auth";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import MenuMobile from "./menu/MobileMenu";
 
 // TODO: Show Dynamic Categories
 const data: Data[] = [
@@ -23,84 +30,134 @@ const data: Data[] = [
     ],
   },
   { id: 3, name: "Contact", url: "/contact" },
-  { id: 4, name: "About", url: "/about" },
 ];
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const user = useAppSelector(selectCurrentUser);
+  const [TriggerLogout] = useLazyLogoutQuery();
+  const dispatch = useAppDispatch();
 
+  const mobileMenuHandler = () => {
+    setMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "auto";
+  }, [isMobileMenuOpen]);
+
+  // Login Handler
   const logoutHandler = async () => {
     try {
-      console.log("Logout API");
-      toast.success("Sign Out Successfully");
-      setIsOpen(false);
+      const response = await TriggerLogout();
+      if (response.isSuccess) {
+        dispatch(logOut());
+        toast.success("Sign Out Successfully");
+        setIsOpen(false);
+      }
     } catch (error) {
       toast.error("Sign Out Fail");
     }
   };
 
   return (
-    <header className="container">
-      <div className="header">
-        {/* Logo */}
-        <Link to="/">
-          <h1>🛍️ Shop</h1>
-        </Link>
+    <header className="bg-slate-900">
+      <div className="w-full max-w-[1280px] mx-auto px-4 py-6 text-white">
+        <div className="flex justify-between items-center">
+          {/* Mobile Icons */}
+          <div className="md:hidden">
+            {!isMobileMenuOpen ? (
+              <AiOutlineMenu
+                size={25}
+                onClick={mobileMenuHandler}
+              />
+            ) : (
+              <RxCross1
+                size={25}
+                onClick={mobileMenuHandler}
+              />
+            )}
+          </div>
 
-        {/* Navigation */}
-        <nav>
-          <Menu data={data} />
-        </nav>
-
-        {/* Links */}
-        <div className="other-links">
-          {/* Cart */}
-          <Link
-            onClick={() => setIsOpen(false)}
-            to={"/cart"}
-          >
-            <FaShoppingBag />
+          {/* Logo */}
+          <Link to="/">
+            <h1 className="text-2xl font-bold hover:text-gray-300">🛍️ ShopNest</h1>
           </Link>
 
-          {/* If User then Display Dialog else Login Link */}
-          {user ? (
-            <>
-              <button onClick={() => setIsOpen((prev) => !prev)}>
-                <FaUser />
-              </button>
-
-              <dialog open={isOpen}>
-                <div>
-                  {/* If Admin */}
-                  {user === "admin" && (
-                    <Link
-                      onClick={() => setIsOpen(false)}
-                      to="/admin/dashboard"
-                    >
-                      Admin
-                    </Link>
-                  )}
-
-                  {/* Order */}
-                  <Link
-                    onClick={() => setIsOpen(false)}
-                    to="/orders"
-                  >
-                    Orders
-                  </Link>
-
-                  {/* Logout */}
-                  <button onClick={logoutHandler}>Logout</button>
-                </div>
-              </dialog>
-            </>
-          ) : (
-            <Link to={"/login"}>
-              <FaSignInAlt />
+          {/* Navigation Menu */}
+          <Menu data={data} />
+          {isMobileMenuOpen && <MenuMobile data={data} />}
+          {/* Links */}
+          <div className="flex items-center gap-4 font-bold text-white relative py-4">
+            {/* Cart */}
+            <Link
+              onClick={() => setIsOpen(false)}
+              to={"/cart"}
+            >
+              <HiOutlineShoppingBag
+                size={25}
+                className="hover:text-gray-300"
+              />
             </Link>
-          )}
+
+            {/* If User then Display Dialog else Login Link */}
+            {user ? (
+              <>
+                {/* User Account Icon */}
+                <button onClick={() => setIsOpen((prev) => !prev)}>
+                  <FaRegUser
+                    size={20}
+                    className="hover:text-gray-300"
+                  />
+                </button>
+
+                {/* Dialog */}
+                <dialog
+                  open={isOpen}
+                  className="bg-slate-600 absolute top-full left-[calc(100%-150px)] min-w-[150px] rounded px-1 py-1 text-white shadow-xl z-9999"
+                >
+                  <div className="flex flex-col">
+                    {/* If Admin */}
+                    {user === "admin" && (
+                      <Link
+                        to="/admin/dashboard"
+                        className="flex items-center h-12 px-3 hover:bg-gray-200 hover:text-black rounded-md"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Admin
+                      </Link>
+                    )}
+
+                    {/* Order */}
+                    <Link
+                      to="/orders"
+                      className="flex items-center h-12 px-3 hover:bg-gray-200 hover:text-black rounded-md"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Orders
+                    </Link>
+
+                    {/* Logout */}
+                    <button
+                      className="flex items-center h-12 px-3 hover:bg-gray-200 hover:text-black rounded-md"
+                      onClick={logoutHandler}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </dialog>
+              </>
+            ) : (
+              // Login Icon
+              <Link to={"/login"}>
+                <SlLogin
+                  size={21}
+                  className="hover:text-gray-300"
+                />
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </header>

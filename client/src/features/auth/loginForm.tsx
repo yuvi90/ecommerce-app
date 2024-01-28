@@ -19,7 +19,6 @@ const Login = () => {
 
     try {
       const userData = await login({ user, pwd }).unwrap();
-      console.log(userData);
       dispatch(setCredentials({ ...userData, user }));
       setUser("");
       setPwd("");

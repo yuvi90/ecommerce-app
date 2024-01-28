@@ -1,0 +1,32 @@
+.product__wrapper {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 768px) {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+  @media (min-width: 1024px) {
+    flex-direction: row;
+  }
+}
+
+.product__carousel {
+  // width: 100%;
+  // max-width: 500px;
+  flex: 1.5;
+
+  @media (min-width: 768px) {
+    width: auto;
+  }
+  @media (min-width: 1024px) {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
+
+.product__details {
+  flex: 1;
+  padding: 10px 0;
+}

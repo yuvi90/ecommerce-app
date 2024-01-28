@@ -14,7 +14,7 @@ const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_SERVER,
   credentials: "include",
   prepareHeaders: (headers, api) => {
-    const token = (api.getState() as RootState).auth.token;
+    const token = (api.getState() as RootState).authReducer.token;
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
     }
@@ -35,7 +35,7 @@ const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
     // try to get a new token
     const refreshResult = await baseQuery("/auth/refresh", api, extraOptions);
     if (refreshResult?.data) {
-      const user = (api.getState() as RootState).auth.user;
+      const user = (api.getState() as RootState).authReducer.user;
       const resultData = refreshResult.data as refreshResponse;
       if (user && resultData.status) {
         // store the new token

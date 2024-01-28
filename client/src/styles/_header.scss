@@ -1,0 +1,106 @@
+.header {
+  @include flex(row, space-between, center, 0);
+  padding: 1rem;
+
+  .menu-link {
+    color: $color2;
+    letter-spacing: 1px;
+    font-size: 18px;
+
+    &:hover {
+      color: $color3;
+    }
+  }
+
+  a {
+    color: $color2;
+
+    &:hover {
+      color: $color3;
+    }
+  }
+
+  .menu-list {
+    @include flex(row, center, stretch, 1.2rem);
+  }
+
+  .menu-list li {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .submenu-link {
+    @include flex(row, center, center, 6px);
+    position: relative;
+  }
+
+  .submenu-list {
+    position: absolute;
+    top: 1.9rem;
+    left: 0;
+    min-width: 250px;
+    padding: 5px;
+    background-color: #fff;
+    color: #000;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 9999;
+  }
+
+  .submenu-item {
+    @include flex(row, space-between, center);
+    padding: 0 0.75rem;
+    border-radius: 0.375rem;
+    height: 3rem;
+
+    > span {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      opacity: 0.5;
+    }
+
+    &:hover {
+      color: #fff;
+      background-color: #000;
+      opacity: 0.3;
+    }
+  }
+
+  .other-links {
+    @include flex(row, center, center, 10px);
+    font-size: 1.2rem;
+    position: relative;
+  }
+
+  button {
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    background-color: transparent;
+    &:hover {
+      color: $color3;
+    }
+  }
+
+  dialog {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 150px;
+    position: absolute;
+    top: 100%;
+    left: calc(100% - 150px);
+    z-index: 9999;
+
+    > div {
+      @include flex(column, center, flex-start, 0.25rem);
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    .primary-menu {
+      display: none;
+    }
+  }
+}

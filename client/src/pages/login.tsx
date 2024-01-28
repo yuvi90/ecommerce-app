@@ -1,10 +1,9 @@
 import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-// import { getUser } from "../features/users/userAPI";
 
 import { setCredentials, useLoginMutation } from "../features/auth";
 import { useAppDispatch } from "../redux/hooks";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [user, setUser] = useState("");
@@ -17,10 +16,8 @@ const Login = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     try {
       const userData = await login({ user, pwd }).unwrap();
-      console.log(userData);
 
       if (userData.status) {
         toast.success("Success");
@@ -39,33 +36,34 @@ const Login = () => {
 
   return (
     <div className="login">
-      <main>
-        <h1 className="heading">Login</h1>
+      <section>
+        <h1>Login</h1>
         <form onSubmit={handleSubmit}>
+          {/* Username */}
           <label htmlFor="username">Username:</label>
-          <div>
-            <input
-              type="text"
-              id="username"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
-              autoComplete="off"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            id="username"
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+            autoComplete="off"
+            required
+          />
+
+          {/* Password */}
           <label htmlFor="password">Password:</label>
-          <div>
-            <input
-              type="password"
-              id="password"
-              onChange={(e) => setPwd(e.target.value)}
-              value={pwd}
-              required
-            />
-          </div>
+          <input
+            type="password"
+            id="password"
+            onChange={(e) => setPwd(e.target.value)}
+            value={pwd}
+            required
+          />
+
+          {/* Button */}
           <button>Sign In</button>
         </form>
-      </main>
+      </section>
     </div>
   );
 };
