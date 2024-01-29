@@ -29,7 +29,7 @@ const ProductCard = ({ product }: Props) => {
   };
 
   return (
-    <div className="flex w-full md:max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
+    <div className="flex w-full md:max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md hover:shadow-xl">
       {/* Product Image */}
       <Link
         className="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl"

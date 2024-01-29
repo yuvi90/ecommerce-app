@@ -9,27 +9,25 @@ import { AiOutlineMenu } from "react-icons/ai";
 
 import toast from "react-hot-toast";
 
-import Menu, { Data } from "./menu/Menu";
+import Menu, { DropDown } from "./menu/Menu";
 import { selectCurrentUser, useLazyLogoutQuery, logOut } from "../../features/auth";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import MenuMobile from "./menu/MobileMenu";
 
 // TODO: Show Dynamic Categories
-const data: Data[] = [
+import { categories } from "../../data";
+
+const data: DropDown[] = [
   { id: 1, name: "Home", url: "/" },
   {
     id: 2,
-    name: "Categories",
-    url: "/categories",
+    name: "Category",
+    url: "/category",
     subMenu: true,
-    subMenuData: [
-      { id: 1, name: "Jordan", doc_count: 11 },
-      { id: 2, name: "Sneakers", doc_count: 8 },
-      { id: 3, name: "Running shoes", doc_count: 64 },
-      { id: 4, name: "Football shoes", doc_count: 107 },
-    ],
+    subMenuData: categories,
   },
   { id: 3, name: "Contact", url: "/contact" },
+  { id: 4, name: "About", url: "/about" },
 ];
 
 const Header = () => {
@@ -39,7 +37,7 @@ const Header = () => {
   const [TriggerLogout] = useLazyLogoutQuery();
   const dispatch = useAppDispatch();
 
-  const mobileMenuHandler = () => {
+  const setMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
   };
 
@@ -70,12 +68,12 @@ const Header = () => {
             {!isMobileMenuOpen ? (
               <AiOutlineMenu
                 size={25}
-                onClick={mobileMenuHandler}
+                onClick={setMobileMenu}
               />
             ) : (
               <RxCross1
                 size={25}
-                onClick={mobileMenuHandler}
+                onClick={setMobileMenu}
               />
             )}
           </div>
@@ -87,9 +85,15 @@ const Header = () => {
 
           {/* Navigation Menu */}
           <Menu data={data} />
-          {isMobileMenuOpen && <MenuMobile data={data} />}
+          {isMobileMenuOpen && (
+            <MenuMobile
+              data={data}
+              setMobileMenu={setMobileMenu}
+            />
+          )}
+
           {/* Links */}
-          <div className="flex items-center gap-4 font-bold text-white relative py-4">
+          <div className="flex items-center gap-6 font-bold text-white relative py-4">
             {/* Cart */}
             <Link
               onClick={() => setIsOpen(false)}

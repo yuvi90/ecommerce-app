@@ -95,18 +95,14 @@ const Cart = () => {
 
         {/* If Cart is Empty */}
         {cartItems.length < 1 && (
-          <div className="flex-[2] flex flex-col items-center pb-[50px] md:-mt-14">
+          <div className="h-[70vh] flex-[2] flex flex-col justify-center items-center pb-[50px] md:-mt-14">
             <img
-              src="/empty-cart.jpg"
-              width={300}
-              height={300}
-              className="w-[300px] md:w-[400px]"
+              src="/empty-cart.png"
+              className="w-[250px]"
             />
             <span className="text-xl font-bold">Your cart is empty</span>
             <span className="text-center mt-4">
               Looks like you have not added anything in your cart.
-              <br />
-              Go ahead and explore top categories.
             </span>
             <Link
               to="/"

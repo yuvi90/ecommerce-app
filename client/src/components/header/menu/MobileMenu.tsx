@@ -3,26 +3,20 @@ import { BsChevronDown } from "react-icons/bs";
 import { Link } from "react-router-dom";
 
 // Types
-export interface SubMenuData {
-  id: number;
-  name: string;
-  slug?: string;
-  doc_count?: number;
-}
-
-export interface Data {
+export interface DropDown {
   id: number;
   name: string;
   url: string;
   subMenu?: boolean;
-  subMenuData?: SubMenuData[];
+  subMenuData?: string[];
 }
 
 interface Props {
-  data: Data[];
+  data: DropDown[];
+  setMobileMenu: () => void;
 }
 
-const MenuMobile = ({ data }: Props) => {
+const MenuMobile = ({ data, setMobileMenu }: Props) => {
   const [showCatMenu, setShowCatMenu] = useState<boolean>(false);
 
   return (
@@ -44,20 +38,17 @@ const MenuMobile = ({ data }: Props) => {
 
                 {showCatMenu && (
                   <div className="bg-black/[0.05] -mx-5 mt-4 -mb-4">
-                    {item.subMenuData?.map((sMenu) => {
+                    {item.subMenuData?.map((dropdown, idx) => {
                       return (
                         <Link
-                          key={sMenu.id}
-                          to=""
+                          key={idx}
+                          to={`${item.url}/${dropdown.trim().toLowerCase().replace(" ", "-")}`}
                           onClick={() => {
                             setShowCatMenu(false);
-                            // setMobileMenu(false);
+                            setMobileMenu();
                           }}
                         >
-                          <div className="py-4 px-8 border-t flex justify-between">
-                            {sMenu.name}
-                            <span className="opacity-50 text-sm">{`(${sMenu.doc_count})`}</span>
-                          </div>
+                          <div className="py-4 px-8 border-t flex justify-between">{dropdown}</div>
                         </Link>
                       );
                     })}
@@ -68,7 +59,7 @@ const MenuMobile = ({ data }: Props) => {
               <div className="py-4 px-5 border-b">
                 <Link
                   to={item.url}
-                  // onClick={() => setMobileMenu(false)}
+                  onClick={() => setMobileMenu()}
                 >
                   {item.name}
                 </Link>
