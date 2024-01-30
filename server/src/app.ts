@@ -28,15 +28,11 @@ const app = express();
 
 // Initializes Middlewares
 app.use(morgan("dev"));
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  }),
-);
+app.use(cors(config.corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
+// Test
 app.get("/", async (req, res) => {
   res.send("API Working");
 });

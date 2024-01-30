@@ -11,33 +11,30 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 //   UpdateProductRequest,
 // } from "../../types/api-types";
 
-interface Product {
-  id: string;
-  title: string;
-  price: number;
+export interface Product {
+  _id: string;
+  name: string;
   description: string;
+  price: number;
+  stock: number;
   category: string;
-  image: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
+  thumbnail?: string;
+  photos?: string[];
 }
 
 export const productAPI = createApi({
   reducerPath: "productApi",
   baseQuery: fetchBaseQuery({
-    // baseUrl: `${import.meta.env.VITE_SERVER}/api/product/`,
-    baseUrl: "https://fakestoreapi.com/",
+    baseUrl: `${import.meta.env.VITE_SERVER}/api/product/`,
   }),
   tagTypes: ["product"],
   endpoints: (builder) => ({
-    allProducts: builder.query<Product[], void>({
-      query: () => "products",
+    allProducts: builder.query<{ status: boolean; products: Product[] }, void>({
+      query: () => "all",
       providesTags: ["product"],
     }),
-    productDetails: builder.query<Product, string>({
-      query: (id) => `products/${id}`,
+    productDetails: builder.query<{ status: boolean; product: Product }, string>({
+      query: (id) => id,
       providesTags: ["product"],
     }),
     // latestProducts: builder.query<AllProductsResponse, string>({

@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// Icons
+import toast from "react-hot-toast";
+// Components & Icons
+import Menu, { DropDownType } from "./menu/Menu";
+import MenuMobile from "./menu/MobileMenu";
 import { SlLogin } from "react-icons/sl";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { FaRegUser } from "react-icons/fa6";
 import { RxCross1 } from "react-icons/rx";
 import { AiOutlineMenu } from "react-icons/ai";
-
-import toast from "react-hot-toast";
-
-import Menu, { DropDown } from "./menu/Menu";
+// Utilities
 import { selectCurrentUser, useLazyLogoutQuery, logOut } from "../../features/auth";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import MenuMobile from "./menu/MobileMenu";
 
 // TODO: Show Dynamic Categories
 import { categories } from "../../data";
-
-const data: DropDown[] = [
+const data: DropDownType[] = [
   { id: 1, name: "Home", url: "/" },
   {
     id: 2,
@@ -30,34 +28,20 @@ const data: DropDown[] = [
   { id: 4, name: "About", url: "/about" },
 ];
 
+/* Header Component */
 const Header = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const user = useAppSelector(selectCurrentUser);
-  const [TriggerLogout] = useLazyLogoutQuery();
-  const dispatch = useAppDispatch();
-
-  const setMobileMenu = () => {
-    setMobileMenuOpen(!isMobileMenuOpen);
-  };
 
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "auto";
   }, [isMobileMenuOpen]);
 
-  // Login Handler
-  const logoutHandler = async () => {
-    try {
-      const response = await TriggerLogout();
-      if (response.isSuccess) {
-        dispatch(logOut());
-        toast.success("Sign Out Successfully");
-        setIsOpen(false);
-      }
-    } catch (error) {
-      toast.error("Sign Out Fail");
-    }
+  const setMobileMenu = () => {
+    setMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const accountDropDownList = ["Orders"];
 
   return (
     <header className="bg-slate-900">
@@ -93,65 +77,18 @@ const Header = () => {
           )}
 
           {/* Links */}
-          <div className="flex items-center gap-6 font-bold text-white relative py-4">
+          <div className="flex items-center gap-6 font-bold text-white relative">
             {/* Cart */}
             <Link
-              onClick={() => setIsOpen(false)}
               to={"/cart"}
+              className="flex justify-center items-center text-2xl hover:text-gray-300"
             >
-              <HiOutlineShoppingBag
-                size={25}
-                className="hover:text-gray-300"
-              />
+              <HiOutlineShoppingBag />
             </Link>
 
             {/* If User then Display Dialog else Login Link */}
             {user ? (
-              <>
-                {/* User Account Icon */}
-                <button onClick={() => setIsOpen((prev) => !prev)}>
-                  <FaRegUser
-                    size={20}
-                    className="hover:text-gray-300"
-                  />
-                </button>
-
-                {/* Dialog */}
-                <dialog
-                  open={isOpen}
-                  className="bg-slate-600 absolute top-full left-[calc(100%-150px)] min-w-[150px] rounded px-1 py-1 text-white shadow-xl z-9999"
-                >
-                  <div className="flex flex-col">
-                    {/* If Admin */}
-                    {user === "admin" && (
-                      <Link
-                        to="/admin/dashboard"
-                        className="flex items-center h-12 px-3 hover:bg-gray-200 hover:text-black rounded-md"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Admin
-                      </Link>
-                    )}
-
-                    {/* Order */}
-                    <Link
-                      to="/orders"
-                      className="flex items-center h-12 px-3 hover:bg-gray-200 hover:text-black rounded-md"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Orders
-                    </Link>
-
-                    {/* Logout */}
-                    <button
-                      className="flex items-center h-12 px-3 hover:bg-gray-200 hover:text-black rounded-md"
-                      onClick={logoutHandler}
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </dialog>
-              </>
+              <AccountDropdown dropDownList={accountDropDownList} />
             ) : (
               // Login Icon
               <Link to={"/login"}>
@@ -167,5 +104,72 @@ const Header = () => {
     </header>
   );
 };
-
 export default Header;
+
+/* Account Dropdown Component */
+const AccountDropdown = ({ dropDownList }: { dropDownList: string[] }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [TriggerLogout] = useLazyLogoutQuery();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectCurrentUser);
+
+  // Logout Handler
+  const logoutHandler = async () => {
+    try {
+      const response = await TriggerLogout();
+      if (response.isSuccess) {
+        dispatch(logOut());
+        toast.success("Success");
+        setIsDropdownOpen(false);
+      }
+    } catch (error) {
+      toast.error("Sign Out Fail");
+    }
+  };
+
+  return (
+    <div
+      className="relative flex items-center gap-2 py-4 cursor-pointer hover:text-gray-300 "
+      onMouseEnter={() => setIsDropdownOpen(true)}
+      onMouseLeave={() => setIsDropdownOpen(false)}
+    >
+      {/* User Account Icon */}
+      <FaRegUser size={20} />
+
+      {/* Dropdown */}
+      {isDropdownOpen && (
+        <div className="absolute bg-slate-600 top-full left-[calc(100%-150px)] min-w-[150px] rounded px-1 py-1 shadow-xl z-9999">
+          {/* If Admin */}
+          {user === "admin" && (
+            <Link
+              to="/admin/dashboard"
+              className="flex items-center h-12 px-3 text-white hover:bg-gray-200 hover:text-black rounded-md"
+              onClick={() => setIsDropdownOpen(false)}
+            >
+              Admin
+            </Link>
+          )}
+          {dropDownList?.map((links, idx) => {
+            return (
+              <Link
+                key={idx}
+                to={`/${links.trim().toLowerCase().replace(" ", "-")}`}
+                onClick={() => setIsDropdownOpen(false)}
+                className="h-12 flex justify-between items-center px-3 text-white hover:bg-gray-200 hover:text-black rounded-md"
+              >
+                {links}
+              </Link>
+            );
+          })}
+          {/* Logout */}
+          <div
+            className="flex items-center h-12 px-3 text-white hover:bg-gray-200 hover:text-black rounded-md"
+            onClick={logoutHandler}
+          >
+            Logout
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

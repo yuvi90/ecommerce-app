@@ -1,19 +1,13 @@
-import { useParams } from "react-router-dom";
-import ProductDetailsCarousel from "./ProductDetailsCarousel";
-import { useAppDispatch } from "../../redux/hooks";
-import { addToCart } from "../../features/cart/cartReducer";
-import { CartItem } from "../../types/types";
-
-// import { useProductDetailsQuery } from "./productAPI";
-
-// TODO: Fetch product from api
-import { products } from "../../data";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-function filterProduct(productId: string | number) {
-  const p = products.filter((p) => p.id == productId);
-  return p[0];
-}
+import { useAppDispatch } from "../../redux/hooks";
+import { useProductDetailsQuery } from "./productAPI";
+import { addToCart } from "../../features/cart/cartReducer";
+import ProductDetailsCarousel from "./ProductDetailsCarousel";
+import { Loader } from "../../components";
+import { CartItem } from "../../types/types";
+import { capitalizeEveryFirstLetter } from "../../utils/features";
 
 const getDiscountedPricePercentage = (originalPrice: number, discountedPrice: number) => {
   const discount = originalPrice - discountedPrice;
@@ -24,9 +18,7 @@ const getDiscountedPricePercentage = (originalPrice: number, discountedPrice: nu
 const ProductDetail = () => {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
-  // const { data, isLoading } = useProductDetailsQuery(id!);
-  // TODO: Fetch product from api
-  const product = filterProduct(id!);
+  const { data, isLoading } = useProductDetailsQuery(id!);
 
   const dispatch = useAppDispatch();
   const addToCartHandler = (cartItem: CartItem) => {
@@ -35,6 +27,14 @@ const ProductDetail = () => {
     toast.success("Added to cart");
   };
 
+  if (isLoading) {
+    return <Loader />;
+  }
+  if (!data?.product) {
+    return null;
+  }
+
+  const product = data?.product;
   return (
     <div className="w-full py-10 md:py-20">
       <div className="w-full max-w-[1280px] px-4 mx-auto">
@@ -52,7 +52,9 @@ const ProductDetail = () => {
             <div className="text-[34px] font-semibold mb-2 leading-tight">{product.name}</div>
 
             {/* Product Category */}
-            <div className="text-lg font-semibold mb-5">{product.category}</div>
+            <div className="text-lg font-semibold mb-5">
+              {capitalizeEveryFirstLetter(product.category)}
+            </div>
 
             {/* Product Price */}
             <div className="flex items-center">
@@ -105,7 +107,7 @@ const ProductDetail = () => {
               className="w-full py-4 rounded-full bg-slate-900 text-white text-lg font-medium transition-transform active:scale-95 mb-3 hover:opacity-75"
               onClick={() =>
                 addToCartHandler({
-                  productId: String(product.id),
+                  productId: product._id,
                   name: product.name,
                   quantity: quantity,
                   stock: product.stock,

@@ -1,5 +1,6 @@
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { server } from "../../redux/store";
 
 const ProductDetailsCarousel = ({ photos }: { photos: string[] }) => {
   return (
@@ -14,7 +15,7 @@ const ProductDetailsCarousel = ({ photos }: { photos: string[] }) => {
         {photos?.map((img) => (
           <img
             key={img}
-            src={`/products/${img}`}
+            src={`${server}/uploads/${img}`}
           />
         ))}
       </Carousel>

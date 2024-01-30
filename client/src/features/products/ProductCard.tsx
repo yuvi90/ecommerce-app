@@ -3,9 +3,10 @@ import toast from "react-hot-toast";
 import { addToCart } from "../cart/cartReducer";
 import { useAppDispatch } from "../../redux/hooks";
 import { CartItem } from "../../types/types";
+import { server } from "../../redux/store";
 
 interface Product {
-  id: number;
+  _id: string;
   name: string;
   description: string;
   mrp?: number;
@@ -33,18 +34,18 @@ const ProductCard = ({ product }: Props) => {
       {/* Product Image */}
       <Link
         className="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl"
-        to={`product/${product.id}`}
+        to={`/product/${product._id}`}
       >
         <img
           className="object-contain mx-auto"
-          src={`/products/${product.thumbnail}`}
-          alt="product image"
+          src={`${server}/uploads/${product.thumbnail}`}
+          alt={product.name}
         />
       </Link>
 
       {/* Product Details */}
       <div className="mt-4 px-5 pb-5">
-        <Link to={`product/${product.id}`}>
+        <Link to={`/product/${product._id}`}>
           <h5 className="text-xl tracking-tight text-slate-900 hover:text-gray-600">
             {product.name.length > 15 ? product.name.substring(0, 15) + "..." : product.name}
           </h5>
@@ -60,7 +61,7 @@ const ProductCard = ({ product }: Props) => {
           className="flex items-center justify-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
           onClick={() =>
             addToCartHandler({
-              productId: String(product.id),
+              productId: String(product._id),
               name: product.name,
               quantity: 1,
               stock: product.stock,

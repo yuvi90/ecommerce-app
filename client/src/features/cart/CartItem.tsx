@@ -2,8 +2,10 @@ import { useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useAppDispatch } from "../../redux/hooks";
 import { removeCartItem, updateQuantity } from "./cartReducer";
+import { capitalizeEveryFirstLetter } from "../../utils/features";
 // Types
 import { CartItem } from "../../types/types";
+import { server } from "../../redux/store";
 interface Props {
   data: CartItem;
 }
@@ -18,7 +20,7 @@ const CartItem = ({ data }: Props) => {
       {/* Product Image */}
       <div className="shrink-0 aspect-square w-[50px] md:w-[120px]">
         <img
-          src={`/products/${p.thumbnail}`}
+          src={`${server}/uploads/${p.thumbnail}`}
           alt={p.name}
           width={120}
           height={120}
@@ -32,7 +34,7 @@ const CartItem = ({ data }: Props) => {
 
           {/* Product Category below md breakpoint */}
           <div className="text-sm md:text-md font-medium text-black/[0.5] block md:hidden">
-            {p.category}
+            {capitalizeEveryFirstLetter(p.category)}
           </div>
 
           {/* Product Price */}
@@ -42,7 +44,9 @@ const CartItem = ({ data }: Props) => {
         </div>
 
         {/* Product Category above md breakpoint */}
-        <div className="text-md font-medium text-black/[0.5] hidden md:block">{p.category}</div>
+        <div className="text-md font-medium text-black/[0.5] hidden md:block">
+          {capitalizeEveryFirstLetter(p.category)}
+        </div>
 
         {/* Quantity and Delete Button Wrapper Start */}
         <div className="flex items-center justify-between mt-4">

@@ -1,26 +1,27 @@
 import { Suspense, lazy } from "react";
 import { Toaster } from "react-hot-toast";
-import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 
-import Loader from "./components/Loader";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { RootState } from "./redux/store";
-
+import { useAppSelector } from "./redux/hooks";
+import { Loader, ProtectedRoute } from "./components";
 import Layout from "./layout/Layout";
-import ProductDetail from "./features/products/ProductDetail";
 
+// Pages Imports
 const Home = lazy(() => import("./pages/Home"));
+const Contact = lazy(() => import("./pages/Contact"));
+const About = lazy(() => import("./pages/About"));
+const Cart = lazy(() => import("./features/cart/Cart"));
+const ProductDetail = lazy(() => import("./features/products/ProductDetail"));
+const AllProducts = lazy(() => import("./features/filters/AllProducts"));
+const Login = lazy(() => import("./pages/Login"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 // const Search = lazy(() => import("./pages/search"));
 // const Cart = lazy(() => import("./pages/cart"));
-const Cart = lazy(() => import("./features/cart/Cart"));
 // const Shipping = lazy(() => import("./pages/shipping"));
-const Login = lazy(() => import("./pages/Login"));
 // const Orders = lazy(() => import("./pages/orders"));
-const NotFound = lazy(() => import("./pages/NotFound"));
 
 const App = () => {
-  const user = useSelector((state: RootState) => state.authReducer.user);
+  const user = useAppSelector((state) => state.authReducer.user);
   const loading = false;
 
   return loading ? (
@@ -41,26 +42,44 @@ const App = () => {
               element={<Home />}
             />
 
+            {/* Contact */}
+            <Route
+              path="/contact"
+              element={<Contact />}
+            />
+
+            {/* About */}
+            <Route
+              path="/about"
+              element={<About />}
+            />
+
             {/* Cart */}
             <Route
               path="/cart"
               element={<Cart />}
             />
 
-            {/* Login */}
-            <Route
-              path="/login"
-              element={
-                // <ProtectedRoute isAuthenticated={user ? false : true}>
-                <Login />
-                // </ProtectedRoute>
-              }
-            />
-
             {/* Product Page */}
             <Route
               path="/product/:id"
               element={<ProductDetail />}
+            />
+
+            {/* All Products Page */}
+            <Route
+              path="/product/all"
+              element={<AllProducts />}
+            />
+
+            {/* Login */}
+            <Route
+              path="/login"
+              element={
+                <ProtectedRoute isAuthenticated={user ? false : true}>
+                  <Login />
+                </ProtectedRoute>
+              }
             />
 
             {/* Error */}
