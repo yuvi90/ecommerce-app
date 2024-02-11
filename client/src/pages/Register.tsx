@@ -1,15 +1,15 @@
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { FieldValues, useForm } from "react-hook-form";
-import { useAppDispatch } from "../redux/hooks";
-import { setCredentials, useLoginMutation } from "../features/auth";
+import { useRegisterMutation } from "../features/auth";
 
 interface FormData {
   user: string;
   pwd: string;
+  email: string;
 }
 
-const Login = () => {
+const Register = () => {
   const {
     register,
     handleSubmit,
@@ -17,28 +17,20 @@ const Login = () => {
   } = useForm<FormData>();
   const navigate = useNavigate();
 
-  const [login] = useLoginMutation();
-  const dispatch = useAppDispatch();
+  const [registerForm] = useRegisterMutation();
 
   const onSubmit = async (data: FieldValues) => {
     try {
-      const { user, pwd } = data;
-      const userData = await login({ user, pwd }).unwrap();
+      const { user, pwd, email } = data;
+      const userData = await registerForm({ user, pwd, email }).unwrap();
       if (userData.status) {
         toast.success("Success");
-        dispatch(
-          setCredentials({
-            user,
-            isAdmin: userData.role === "admin" ? true : false,
-            accessToken: userData.accessToken,
-          }),
-        );
-        navigate("/");
+        navigate("/login");
       } else {
-        toast.error("Sign In Fail");
+        toast.error("Sign up fails.");
       }
     } catch (err) {
-      toast.error("Sign In Fail");
+      toast.error("Sign up fails.");
       console.log(err);
     }
   };
@@ -46,8 +38,25 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center my-20 px-4">
       <section className="w-full max-w-[500px] mx-auto bg-gray-100 px-5 py-10 md:px-10 rounded-xl">
-        <h1 className="text-4xl mb-10 text-center font-bold">Login</h1>
+        <h1 className="text-4xl mb-10 text-center font-bold">Sign Up</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Email */}
+          <label
+            htmlFor="email"
+            className="block mt-4 text-sm font-medium text-gray-600"
+          >
+            Email:
+          </label>
+          <input
+            {...register("email", { required: "Email is required" })}
+            type="email"
+            id="email"
+            className={`mt-1 p-2 w-full border rounded-md ${errors.email ? "border-red-500" : ""}`}
+          />
+          {errors.email?.type === "required" && (
+            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+          )}
+
           {/* Username */}
           <label
             htmlFor="username"
@@ -82,19 +91,19 @@ const Login = () => {
             <p className="text-red-500 text-sm mt-1">{errors.pwd.message}</p>
           )}
 
-          {/* Register Link */}
+          {/* Login Link */}
           <div className="mt-5 text-sm font-medium text-slate-900 ">
             <Link
-              to="/register"
+              to="/login"
               className="hover:text-slate-500"
             >
-              Don't have an account ?
+              Already have an account ?
             </Link>
           </div>
 
           {/* Button */}
           <button className="w-full py-4 rounded-full bg-slate-900 text-white text-lg font-medium transition-transform active:scale-95 mb-3 hover:opacity-75 mt-4">
-            Sign In
+            Register
           </button>
         </form>
       </section>
@@ -102,4 +111,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

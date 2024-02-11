@@ -7,61 +7,146 @@ interface TypedRequestBody<T> extends Request {
 }
 
 const ProfileController = {
-  getProfile: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.params.id;
-
-      if (!userId) {
-        return res.status(400).json({
-          status: false,
-          message: "Invalid Id",
-        });
-      }
-
-      // Find the user profile by user_id
-      const userProfile = await profileService.findUserProfileByUserId({ user: userId });
-
-      if (!userProfile) {
-        return res.status(404).json({ error: "Profile not found" });
-      }
-
-      res.status(200).json({ userProfile });
-    } catch (error) {
-      next(error);
-    }
-  },
-
+  /**
+   *
+   * Create New Profile
+   *
+   */
   createNewProfile: async (
     req: TypedRequestBody<Partial<IUserProfile>>,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const userId = req.params.id;
+      const userName = req.query.user as string;
       const { ...profileData } = req.body;
 
       if (
-        !userId ||
+        !userName ||
         !profileData.name ||
         !profileData.address ||
+        !profileData.address.street ||
         !profileData.address.city ||
         !profileData.address.state ||
-        !profileData.address.street ||
-        !profileData.address.zip
+        !profileData.address.country ||
+        !profileData.address.zipCode
       ) {
-        res.status(400).json({ status: false, message: "Incomplete fields !" });
+        res.status(400).json({ status: false, message: "Incomplete fields." });
       }
 
-      const result = await profileService.createUserProfile(userId, profileData);
-
-      // Send Response
+      const result = await profileService.createUserProfile({ username: userName }, profileData);
       if (result) {
         return res.status(201).json({
           status: true,
-          success: `Profile created!`,
+          message: `Profile created.`,
+        });
+      } else {
+        throw new Error("Something went wrong.");
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   *
+   * Get Profile
+   *
+   */
+  getProfile: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userName = req.query.user as string;
+      if (!userName) {
+        return res.status(400).json({
+          status: false,
+          message: "Invalid Username.",
+        });
+      }
+
+      const userProfile = await profileService.findUserProfileByUsername({ username: userName });
+      if (!userProfile) {
+        return res.status(404).json({ error: "Profile not found." });
+      }
+      res.status(200).json({ status: true, userProfile: userProfile });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   *
+   * Get All Profiles
+   *
+   */
+  getAllProfiles: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userProfiles = await profileService.getAll();
+      if (!userProfiles) {
+        return res.status(404).json({ error: "Profile not found." });
+      }
+      res.status(200).json({ userProfiles });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   *
+   * Update Profile
+   *
+   */
+  updateProfile: async (
+    req: TypedRequestBody<Partial<IUserProfile>>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userName = req.query.user as string;
+      const { ...profileData } = req.body;
+
+      if (!userName) {
+        res.status(400).json({ status: false, message: "Invalid Username." });
+      }
+
+      const result = await profileService.updateUserProfileByUserName(
+        { username: userName },
+        profileData,
+      );
+
+      if (result) {
+        return res.status(201).json({
+          status: true,
+          message: `Profile updated.`,
         });
       } else {
         throw new Error("Something went wrong !");
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   *
+   * Delete Profile
+   *
+   */
+  deleteProfile: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userName = req.query.user as string;
+
+      if (!userName) {
+        res.status(400).json({ status: false, message: "Invalid Username." });
+      }
+
+      const result = await profileService.deleteUserProfileByUserName({ username: userName });
+      if (result) {
+        return res.status(201).json({
+          status: true,
+          message: `Profile deleted.`,
+        });
+      } else {
+        throw new Error("Something went wrong.");
       }
     } catch (error) {
       next(error);

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { addToCart } from "../cart/cartReducer";
+import { addToCart, calculatePrice } from "../cart/cartReducer";
 import { useAppDispatch } from "../../redux/hooks";
 import { CartItem } from "../../types/types";
 import { server } from "../../redux/store";
@@ -26,6 +26,7 @@ const ProductCard = ({ product }: Props) => {
   const addToCartHandler = (cartItem: CartItem) => {
     if (cartItem.stock < 1) return toast.error("Out of Stock");
     dispatch(addToCart(cartItem));
+    dispatch(dispatch(calculatePrice()));
     toast.success("Added to cart");
   };
 

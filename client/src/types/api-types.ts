@@ -1,4 +1,4 @@
-import { Bar, CartItem, Line, Order, Pie, Product, ShippingInfo, Stats, User } from "./types";
+import { Bar, CartItem, Line, Order, Pie, Product, Stats, User } from "./types";
 
 export type CustomError = {
   status: number;
@@ -9,7 +9,7 @@ export type CustomError = {
 };
 
 export type MessageResponse = {
-  success: boolean;
+  status: boolean;
   message: string;
 };
 
@@ -24,11 +24,11 @@ export type UserResponse = {
 };
 
 export type AllProductsResponse = {
-  success: boolean;
+  status: boolean;
   products: Product[];
 };
 export type CategoriesResponse = {
-  success: boolean;
+  status: boolean;
   categories: string[];
 };
 
@@ -43,12 +43,12 @@ export type SearchProductsRequest = {
   sort: string;
 };
 export type ProductResponse = {
-  success: boolean;
+  status: boolean;
   product: Product;
 };
 
 export type AllOrdersResponse = {
-  success: boolean;
+  status: boolean;
   orders: Order[];
 };
 export type OrderDetailsResponse = {
@@ -91,14 +91,17 @@ export type DeleteProductRequest = {
 };
 
 export type NewOrderRequest = {
-  shippingInfo: ShippingInfo;
-  orderItems: CartItem[];
-  subtotal: number;
-  tax: number;
-  shippingCharges: number;
-  discount: number;
-  total: number;
-  user: string;
+  customerName: string;
+  customerUserName: string;
+  shippingInfo: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    zipCode: string;
+  };
+  products: CartItem[];
+  totalAmount: number;
 };
 
 export type UpdateOrderRequest = {

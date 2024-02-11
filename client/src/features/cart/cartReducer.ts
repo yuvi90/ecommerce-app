@@ -11,11 +11,12 @@ const initialState: CartReducerInitialState = {
   discount: 0,
   total: 0,
   shippingInfo: {
-    address: "",
+    name: "",
+    street: "",
     city: "",
     state: "",
     country: "",
-    pinCode: "",
+    zipCode: "",
   },
 };
 
@@ -60,12 +61,15 @@ export const cartReducer = createSlice({
       state.tax = Math.round(state.subtotal * 0.18);
       state.total = state.subtotal + state.tax + state.shippingCharges - state.discount;
     },
+
     discountApplied: (state, action: PayloadAction<number>) => {
       state.discount = action.payload;
     },
+
     saveShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
       state.shippingInfo = action.payload;
     },
+
     resetCart: () => initialState,
   },
 });

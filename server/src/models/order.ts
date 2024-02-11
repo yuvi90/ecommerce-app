@@ -8,13 +8,14 @@ export interface IProduct {
 }
 
 export interface IOrder {
-  customerId: mongoose.Types.ObjectId;
   customerName: string;
+  customerUserName: string;
   shippingInfo: {
     street: string;
     city: string;
     state: string;
-    zip: string;
+    country: string;
+    zipCode: string;
   };
   products: IProduct[];
   status: string;
@@ -25,20 +26,20 @@ export interface IOrderDocument extends Document, IOrder {}
 
 const OrderSchema = new Schema<IOrderDocument>(
   {
-    customerId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "Please provide a customer ID."],
-    },
     customerName: {
       type: String,
       required: [true, "Please enter customer name."],
+    },
+    customerUserName: {
+      type: String,
+      required: [true, "Please provide a customer username."],
     },
     shippingInfo: {
       street: { type: String, required: true },
       city: { type: String, required: true },
       state: { type: String, required: true },
-      zip: { type: String, required: true },
+      country: { type: String, required: true },
+      zipCode: { type: String, required: true },
     },
     products: [
       {
@@ -47,7 +48,10 @@ const OrderSchema = new Schema<IOrderDocument>(
           ref: "Product",
           required: [true, "Please provide a product ID."],
         },
-        name: { type: String, required: [true, "Please enter product name."] },
+        name: {
+          type: String,
+          required: [true, "Please enter product name."],
+        },
         quantity: {
           type: Number,
           required: [true, "Please enter product quantity."],
@@ -74,6 +78,4 @@ const OrderSchema = new Schema<IOrderDocument>(
   },
 );
 
-const Order: Model<IOrderDocument> = mongoose.model<IOrderDocument>("Order", OrderSchema);
-
-export default Order;
+export const Order: Model<IOrderDocument> = mongoose.model<IOrderDocument>("Order", OrderSchema);

@@ -1,47 +1,70 @@
-import { Model, FilterQuery } from "mongoose";
-import { UserProfile, IUserProfile, IUserProfileDocument } from "../models/userProfile.js";
+import { Model, FilterQuery, UpdateQuery } from "mongoose";
 import { User, IUserDocument } from "../models/user.js";
+import { UserProfile, IUserProfile, IUserProfileDocument } from "../models/userProfile.js";
 
 class ProfileService {
-  private userProfileModel: Model<IUserProfileDocument>;
   private userModel: Model<IUserDocument>;
+  private userProfileModel: Model<IUserProfileDocument>;
 
-  constructor(userProfileModel: Model<IUserProfileDocument>, userModel: Model<IUserDocument>) {
-    this.userProfileModel = userProfileModel;
+  constructor(userModel: Model<IUserDocument>, userProfileModel: Model<IUserProfileDocument>) {
     this.userModel = userModel;
+    this.userProfileModel = userProfileModel;
+  }
+
+  async getAll(): Promise<IUserProfileDocument[] | null> {
+    return this.userProfileModel.find({}).exec();
   }
 
   async createUserProfile(
-    userId: string,
-    profileData: Partial<IUserProfile>,
-  ): Promise<IUserProfileDocument> {
-    const userProfileData = { ...profileData, user: userId };
-    return this.userProfileModel.create(userProfileData);
-  }
-
-  async findUserProfileByUserId(
     query: FilterQuery<IUserDocument>,
+    profileData: Partial<IUserProfile>,
   ): Promise<IUserProfileDocument | null> {
-    return this.userProfileModel.findOne(query._id).exec();
+    const user = await this.userModel.findOne(query).exec();
+    if (user) {
+      const userProfileData = { ...profileData, userId: user._id };
+      return this.userProfileModel.create(userProfileData);
+    } else {
+      return null;
+    }
   }
 
   async findUserProfileByUsername(
     query: FilterQuery<IUserDocument>,
   ): Promise<IUserProfileDocument | null> {
-    const user = await this.userModel.findOne(query.username).exec();
-    return this.userProfileModel.findOne({ user: user?._id }).exec();
+    const user = await this.userModel.findOne(query).exec();
+    if (user) {
+      return this.userProfileModel.findOne({ userId: user._id }).select("-userId -_id -__v").exec();
+    } else {
+      return null;
+    }
   }
 
-  async updateUserProfileById(
-    userId: string,
-    updateData: Partial<IUserProfile>,
+  async updateUserProfileByUserName(
+    query: FilterQuery<IUserDocument>,
+    updateData: UpdateQuery<IUserProfileDocument>,
   ): Promise<IUserProfileDocument | null> {
-    return this.userProfileModel
-      .findOneAndUpdate({ user: userId }, updateData, { new: true })
-      .exec();
+    const user = await this.userModel.findOne(query).exec();
+    if (user) {
+      return this.userProfileModel
+        .findOneAndUpdate({ userId: user._id }, updateData, { new: true })
+        .exec();
+    } else {
+      return null;
+    }
+  }
+
+  async deleteUserProfileByUserName(
+    query: FilterQuery<IUserDocument>,
+  ): Promise<IUserProfileDocument | null> {
+    const user = await this.userModel.findOne(query).exec();
+    if (user) {
+      return this.userProfileModel.findOneAndDelete({ userId: user._id }).exec();
+    } else {
+      return null;
+    }
   }
 }
 
-const profileService = new ProfileService(UserProfile, User);
+const profileService = new ProfileService(User, UserProfile);
 
 export default profileService;

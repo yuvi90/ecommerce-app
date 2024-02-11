@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useAppDispatch } from "../../redux/hooks";
-import { removeCartItem, updateQuantity } from "./cartReducer";
+import { removeCartItem, updateQuantity, calculatePrice } from "./cartReducer";
 import { capitalizeEveryFirstLetter } from "../../utils/features";
 // Types
 import { CartItem } from "../../types/types";
@@ -62,6 +62,7 @@ const CartItem = ({ data }: Props) => {
               onChange={(event) => {
                 const newQuantity = parseInt(event.target.value);
                 dispatch(updateQuantity({ productId: p.productId, newQuantity }));
+                dispatch(calculatePrice());
                 setSelectedQuantity(newQuantity);
               }}
             >
@@ -76,7 +77,10 @@ const CartItem = ({ data }: Props) => {
           {/* Delete Button */}
           <RiDeleteBin6Line
             className="cursor-pointer text-black/[0.5] hover:text-red-500 text-[16px] md:text-[20px]"
-            onClick={() => dispatch(removeCartItem(String(p.productId)))}
+            onClick={() => {
+              dispatch(removeCartItem(String(p.productId)));
+              dispatch(calculatePrice());
+            }}
           />
         </div>
         {/* Quantity and Delete Button Wrapper End */}

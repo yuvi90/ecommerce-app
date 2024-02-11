@@ -41,7 +41,7 @@ const Header = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const accountDropDownList = ["Orders"];
+  const accountDropDownList = ["Profile", "Orders"];
 
   return (
     <header className="bg-slate-900">
@@ -146,7 +146,7 @@ const AccountDropdown = ({ dropDownList }: { dropDownList: string[] }) => {
               className="flex items-center h-12 px-3 text-white hover:bg-gray-200 hover:text-black rounded-md"
               onClick={() => setIsDropdownOpen(false)}
             >
-              Admin
+              Dashboard
             </Link>
           )}
           {dropDownList?.map((links, idx) => {

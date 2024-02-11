@@ -64,7 +64,7 @@ const AuthController = {
       if (result) {
         return res.status(201).json({
           status: true,
-          success: `New user created!`,
+          message: `New user created!`,
         });
       } else {
         throw new Error("Something went wrong !");
@@ -148,6 +148,7 @@ const AuthController = {
 
         return res.status(201).json({
           status: true,
+          role: foundUser.role,
           accessToken,
         });
       } else {
@@ -232,6 +233,7 @@ const AuthController = {
 
       res.status(201).json({
         status: true,
+        role: foundUser.role,
         accessToken: accessToken,
       });
     } catch (error) {

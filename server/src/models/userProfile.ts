@@ -1,18 +1,19 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 
 export interface IUserProfile {
-  user: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   name: string;
   address: {
     street: string;
     city: string;
     state: string;
-    zip: string;
+    country: string;
+    zipCode: string;
   };
 
   // Additional profile information
   avatar?: string;
-  gender?: "male" | "female" | "trans";
+  gender?: "male" | "female" | "others";
   dob?: Date | undefined;
   age?: number | undefined; // Virtual Attribute
   createdAt?: Date;
@@ -23,7 +24,7 @@ export interface IUserProfileDocument extends Document, IUserProfile {}
 
 const schema = new Schema<IUserProfileDocument>(
   {
-    user: { type: Schema.Types.ObjectId, required: true, unique: true },
+    userId: { type: Schema.Types.ObjectId, required: true, unique: true },
     name: {
       type: String,
       required: [true, "Please enter full name"],
@@ -32,7 +33,8 @@ const schema = new Schema<IUserProfileDocument>(
       street: { type: String, required: true },
       city: { type: String, required: true },
       state: { type: String, required: true },
-      zip: { type: String, required: true },
+      country: { type: String, required: true },
+      zipCode: { type: String, required: true },
     },
 
     // Additional profile information

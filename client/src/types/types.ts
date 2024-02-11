@@ -8,21 +8,24 @@ export type User = {
   _id: string;
 };
 
-export type Product = {
+export interface Product {
+  _id: string;
   name: string;
+  description: string;
   price: number;
   stock: number;
   category: string;
-  photo: string;
-  _id: string;
-};
+  thumbnail?: string;
+  photos?: string[];
+}
 
 export type ShippingInfo = {
-  address: string;
+  name: string;
+  street: string;
   city: string;
   state: string;
   country: string;
-  pinCode: string;
+  zipCode: string;
 };
 
 export type CartItem = {

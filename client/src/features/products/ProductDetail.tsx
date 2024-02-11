@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAppDispatch } from "../../redux/hooks";
 import { useProductDetailsQuery } from "./productAPI";
-import { addToCart } from "../../features/cart/cartReducer";
+import { addToCart, calculatePrice } from "../../features/cart/cartReducer";
 import ProductDetailsCarousel from "./ProductDetailsCarousel";
 import { Loader } from "../../components";
 import { CartItem } from "../../types/types";
@@ -24,6 +24,7 @@ const ProductDetail = () => {
   const addToCartHandler = (cartItem: CartItem) => {
     if (cartItem.stock < 1) return toast.error("Out of Stock");
     dispatch(addToCart(cartItem));
+    dispatch(calculatePrice());
     toast.success("Added to cart");
   };
 

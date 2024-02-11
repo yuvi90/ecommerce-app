@@ -14,8 +14,8 @@ export const server = import.meta.env.VITE_SERVER;
 export const store = configureStore({
   reducer: {
     // API
-    [productAPI.reducerPath]: productAPI.reducer,
     [api.reducerPath]: api.reducer,
+    [productAPI.reducerPath]: productAPI.reducer,
     // [orderApi.reducerPath]: orderApi.reducer,
     // [dashboardApi.reducerPath]: dashboardApi.reducer,
     // Reducer

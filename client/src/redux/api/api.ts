@@ -6,6 +6,7 @@ import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolk
 import { RootState } from "../store";
 interface refreshResponse {
   status: boolean;
+  role: string;
   accessToken: string;
 }
 
@@ -39,7 +40,13 @@ const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
       const resultData = refreshResult.data as refreshResponse;
       if (user && resultData.status) {
         // store the new token
-        api.dispatch(setCredentials({ user: user, accessToken: resultData.accessToken }));
+        api.dispatch(
+          setCredentials({
+            user: user,
+            isAdmin: resultData.role === "admin" ? true : false,
+            accessToken: resultData.accessToken,
+          }),
+        );
       }
       // retry the initial query with new access token
       result = await baseQuery(args, api, extraOptions);

@@ -14,12 +14,12 @@ import { RootState } from "./redux/store";
 const Home = lazy(() => import("./pages/Home"));
 const Search = lazy(() => import("./pages/search"));
 const Cart = lazy(() => import("./pages/cart"));
-const Shipping = lazy(() => import("./pages/shipping"));
+const Shipping = lazy(() => import("./pages/Shipping"));
 const Login = lazy(() => import("./pages/login"));
 const Orders = lazy(() => import("./pages/orders"));
 const OrderDetails = lazy(() => import("./pages/order-details"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Checkout = lazy(() => import("./pages/checkout"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 // Admin Routes Importing
 const Dashboard = lazy(() => import("./pages/admin/dashboard"));

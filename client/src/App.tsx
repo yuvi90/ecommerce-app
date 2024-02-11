@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import { useAppSelector } from "./redux/hooks";
 import { Loader, ProtectedRoute } from "./components";
 import Layout from "./layout/Layout";
+import RequireAuth from "./features/auth/RequireAuth";
 
 // Pages Imports
 const Home = lazy(() => import("./pages/Home"));
@@ -14,21 +15,24 @@ const Cart = lazy(() => import("./features/cart/Cart"));
 const ProductDetail = lazy(() => import("./features/products/ProductDetail"));
 const AllProducts = lazy(() => import("./features/filters/AllProducts"));
 const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 // const Search = lazy(() => import("./pages/search"));
-// const Cart = lazy(() => import("./pages/cart"));
-// const Shipping = lazy(() => import("./pages/shipping"));
-// const Orders = lazy(() => import("./pages/orders"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Shipping = lazy(() => import("./pages/Shipping"));
+const Orders = lazy(() => import("./features/orders/Orders"));
+const Dashboard = lazy(() => import("./features/admin/Dashboard"));
 
 const App = () => {
   const user = useAppSelector((state) => state.authReducer.user);
+  const isAdmin = useAppSelector((state) => state.authReducer.isAdmin);
+
   const loading = false;
 
   return loading ? (
     <Loader />
   ) : (
     <>
-      {/* Header */}
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* Layout */}
@@ -54,12 +58,6 @@ const App = () => {
               element={<About />}
             />
 
-            {/* Cart */}
-            <Route
-              path="/cart"
-              element={<Cart />}
-            />
-
             {/* Product Page */}
             <Route
               path="/product/:id"
@@ -72,6 +70,12 @@ const App = () => {
               element={<AllProducts />}
             />
 
+            {/* Cart */}
+            <Route
+              path="/cart"
+              element={<Cart />}
+            />
+
             {/* Login */}
             <Route
               path="/login"
@@ -81,6 +85,50 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            {/* Login */}
+            <Route
+              path="/register"
+              element={
+                <ProtectedRoute isAuthenticated={user ? false : true}>
+                  <Register />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Dashboard */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={user ? true : false}
+                  admin={isAdmin ? true : false}
+                  adminOnly={true}
+                >
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* protected routes */}
+            <Route element={<RequireAuth />}>
+              {/* Orders */}
+              <Route
+                path="/orders"
+                element={<Orders />}
+              />
+
+              {/* Shipping */}
+              <Route
+                path="/shipping"
+                element={<Shipping />}
+              />
+
+              {/* Checkout */}
+              <Route
+                path="/pay"
+                element={<Checkout />}
+              />
+            </Route>
 
             {/* Error */}
             <Route
