@@ -41,7 +41,8 @@ const Header = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const accountDropDownList = ["Profile", "Orders"];
+  // const accountDropDownList = ["Profile", "Orders"];
+  const accountDropDownList = ["Orders"];
 
   return (
     <header className="bg-slate-900">
